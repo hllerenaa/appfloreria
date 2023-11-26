@@ -22,8 +22,8 @@ def registro(request):
     if request.method == 'POST':
         with transaction.atomic():
             try:
-                if not 'terminoscondiciones' in request.POST:
-                    raise ValueError("Para continuar, debe aceptar los términos y condiciones & políticas de privacidad.")
+                # if not 'terminoscondiciones' in request.POST:
+                #     raise ValueError("Para continuar, debe aceptar los términos y condiciones & políticas de privacidad.")
                 if Usuario.objects.filter(email=request.POST['email'], status=True, is_active=True).exists():
                     raise ValueError("Correo electrónico ya se encuentra en uso por otro usuario..")
                 if Usuario.objects.filter(documento=request.POST['documento'], status=True, is_active=True).exists():
