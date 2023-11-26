@@ -10,7 +10,7 @@ from seguridad.models import Configuracion, Modulo, ModuloGrupo, GroupModulo
 class ConfiguracionForm(ModelFormBase):
     class Meta:
         model = Configuracion
-        exclude = ('paypal_modo', 'payphone_modo', 'porcentaje_pagoonline', 'usuario_creacion', 'terminosycondiciones', 'privacidad', 'faq', 'fondo_perfil', 'banner_login', 'logocertificacion', 'titulocertificacion', 'brevedescripcion', 'descripcioncertificacion', 'etiquetacertificacion')
+        exclude = ('paypal_modo', 'payphone_modo', 'porcentaje_pagoonline', 'usuario_creacion', 'terminosycondiciones', 'privacidad', 'faq', 'fondo_perfil', 'banner_login', )
 
     def __init__(self, *args, **kwargs):
         super(ConfiguracionForm, self).__init__(*args, **kwargs)

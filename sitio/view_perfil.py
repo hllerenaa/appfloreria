@@ -105,5 +105,4 @@ def perfil(request):
             if action == 'changefotos':
                 data['titulo'] = 'Cambiar Foto'
                 return render(request, 'sitio/perfil/changefotos.html', data)
-    data['fecha_nacimiento'] = str(request.user.fecha_nacimiento)
     return render(request, 'sitio/perfil/perfil.html', data)

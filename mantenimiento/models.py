@@ -31,8 +31,9 @@ class Carousel(ModeloBase):
     imagen = models.FileField(upload_to='carousel/1/', max_length=600, blank=True, null=True, verbose_name='Imágen 2000x500px')
     titulo_1 = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Título 1')
     # titulo_2 = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Título 2')
-    # detalle = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Detalle')
-    # url_boton = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Url Boton')
+    detalle = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Detalle')
+    url_boton = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Url Boton')
+    texto_boton = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Texto Boton')
     publicado = models.BooleanField(default=False, verbose_name='Publicado')
 
     def publicado_activo(self):

@@ -31,7 +31,6 @@
     <div class="panel panel-default">
 
 
-
         <div class="panel-body">
             <div class="table-responsive">
                 <table id="tabla" class="table table-hover table-td-valign-middle table-bordered">
@@ -60,6 +59,13 @@
                             <td class="text-center">
                                 <strong># {{ l.orden }}</strong>
                             </td>
+                            <td style="text-align: center">
+                                <b>{{ l.titulo_1 }}</b><br>{{ l.detalle }}
+                                {% if l.url_boton %}<br>
+                                    <a href="{{ l.url_boton }}"
+                                       class="btn btn-success btn-mini">{{ l.texto_boton }}</a>
+                                {% endif %}
+                            </td>
                             <td class="text-center">
                                 <a href="/media/{{ l.imagen }}" data-lightbox="roadtrip"
                                    title="{{ l.orden }}">
@@ -68,9 +74,6 @@
                                          width="150px" align="middle"
                                          alt="...">
                                 </a>
-                            </td>
-                            <td style="text-align: center">
-                                <b>{{ l.titulo }}</b><br>{{ l.descripcion }}
                             </td>
                             <td style="text-align: center">
                                 <i class="{{ l.publicado_activo|safe }}"></i>
