@@ -1,0 +1,54 @@
+{% extends 'sitio/perfil/baseperfil.html' %}
+{% load templatefunctions %}
+
+{% block contentperfil %}
+
+    <div class="col-lg-9 pt-4 pb-2 pb-sm-4">
+        <!-- Basic info-->
+        <section class="card border-0 py-1 p-md-2 p-xl-3 p-xxl-4 mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center mt-sm-n1 mb-0 mb-lg-1"><i
+                        class="ai-image text-primary lead pe-1 me-2"></i>
+                    <h2 class="h4 mb-0">Cambiar foto</h2>
+                </div>
+                <form name="frmFotos" id="frmFotos" method="POST" action="{{ request.path }}"
+                      enctype="multipart/form-data"> {% csrf_token %}
+                    <input name="action" value="changefotos" type="hidden">
+                    <div class="row align-items-center g-3 g-sm-4 pb-3">
+                        <div class="row g-3 g-sm-4">
+                            <div class="col-sm-12">
+                                <input type="file" name="foto" {% if request.user.foto %} required
+                                       data-default-file="{{ request.user.get_foto }}" {% endif %}
+                                       data-allowed-file-extensions="jpg jpeg png tiff svg jfif"
+                                       data-parsley-required="true" data-parsley-group="step-3"
+                                       data-parsley-required-message="Foto 1 es obligatoria"
+                                       class="form-control dropify" id="id_img1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary" href="{{ request.path }}?action=changefotos">Cancelar</a>
+                        <button class="btn btn-primary ms-3" type="submit">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block jscript %}
+    <script src="/static/js/forms.js?version=11"></script>
+    <script>
+        $(function () {
+            $('.dropify').dropify({
+                messages: {
+                    default: '',
+                    replace: '',
+                    remove: 'Eliminar',
+                },
+                imgFileExtensions: ["jpg", "jpeg", "png", "tiff", "jfif", "svg"]
+            });
+        })
+    </script>
+{% endblock %}

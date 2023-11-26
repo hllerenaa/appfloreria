@@ -1,0 +1,107 @@
+{% extends 'sitio/base.html' %}
+{% block link %}{% endblock %}
+{% block content %}
+    <div class="breadcrumbs-area position-relative">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="breadcrumb-content position-relative section-content">
+                        <h3 class="title-3">Inicio de Sesión</h3>
+                        <ul>
+                            <li><a href="/">Inicio</a></li>
+                            <li>Formulario de Ingreso</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column align-items-center position-relative mt-50"
+         style="margin-top: 50px; padding: 25px">
+        <div class="d-flex flex-column align-items-center w-lg-50 h-100 px-3 px-lg-5 pt-2">
+            <div class="w-100 mt-auto" style="max-width: 526px;">
+                <h1>Iniciar Sesión</h1>
+                <p class="pb-3 mb-3 mb-lg-4">
+                    ¿Aún no tienes una cuenta?&nbsp;&nbsp;<a href='/register/' class="btn-link">Registrate ahora!</a>
+                </p>
+                <form method="post" id="frm-logear">{% csrf_token %}
+                    {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
+                    <div class="pb-3 mb-3">
+                        <div class="position-relative"><i
+                                class="ai-user fs-lg position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                            <input class="form-control form-control-lg ps-5" type="text" placeholder="Nombre de usuario"
+                                   name="usuario" id="id_usuario"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="position-relative"><i
+                                class="ai-lock-closed fs-lg position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                            <div class="password-toggle">
+                                <input class="form-control form-control-lg ps-5" type="password"
+                                       placeholder="Contraseña" name="password" id="password"
+                                       required>
+                                <label class="password-toggle-btn" aria-label="Show/hide password">
+                                    <input class="password-toggle-check" type="checkbox"><span
+                                        class="password-toggle-indicator"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn flosun-button secondary-btn theme-color rounded-0" type="submit">Ingresar a mi cuenta</button>
+                    <div class=" align-items-center justify-content-between pb-4">
+                    <br>
+                        <a class="fs-sm fw-semibold text-decoration-none my-1" href="/restoreusername/">¿Olvidaste tu
+                            nombre de usuario?</a><br>
+                        <a class="fs-sm fw-semibold text-decoration-none my-1" href="/restorepass/">¿Olvidaste tu
+                            contraseña?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><br><br><br>
+
+{% endblock %}
+{% block jscript %}
+    <script>
+        $('#frm-logear').on({
+            submit: function (e) {
+                e.preventDefault();
+                var frmData = new FormData($(this)[0]);
+                $.ajax({
+                    url: '/login/',
+                    data: frmData,
+                    method: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    enctype: $(this).attr('enctype'),
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        pantallaespera()
+                    }
+                }).done(function (data) {
+                    setTimeout($.unblockUI, 1);
+                    if (data.resp === true) {
+                        if (data.redirect) {
+                            location = data.redirect;
+                        } else {
+                            location = "/";
+                        }
+                        return false;
+                    } else {
+                        mensajeDanger(data.error);
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 403) {
+                        location.reload();
+                    }
+                    mensajeDanger('Error de conexión.');
+                });
+            }
+        });
+    </script>
+{% endblock %}

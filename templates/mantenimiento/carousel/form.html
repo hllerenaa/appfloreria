@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block atras %}{{ request.path }}{% endblock %}
+{% block content %}
+
+    <div class="panel panel-default" data-sortable-id="form-stuff-2">
+
+        <div class="panel-heading ui-sortable-handle">
+            <h4 class="panel-title">{{ titulo }} Formulario</h4>
+            <div class="panel-heading-btn">
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i
+                        class="fa fa-expand"></i></a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <form autocomplete="off" method="post" enctype="multipart/form-data" action="{{ ruta }}"
+                  class="">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{ pk|default:0 }}"/>
+                <input type="hidden" name="action" value="{{ action }}"/>
+                <div class="row">
+                    {% for field in form %}
+                        {% if field.is_hidden %}
+                            {{ field }}
+                        {% elif field.name in "'imagen', 'imagen2', 'imagen3', 'imagen4'," %}
+                            <div class="col-lg-{{ field.field.widget.attrs.col }}">
+                                <div class="form-group">
+                                    <label class="form-label"
+                                           for="id_{{ field.name }}">{{ field.label }}</label>
+                                    <div class="media align-items-center">
+                                        <input type="file"
+                                               name="{{ field.name }}"
+                                               data-default-file="{{ field.field.widget.attrs.data_default_file }}"
+                                               data-min-width="{{ field.field.widget.attrs.data_min_width }}"
+                                               class="form-control"
+                                               id="id_{{ field.name }}" data-min-heigh="500"
+                                               data-allowed-file-extensions="jpg png jpeg tiff">
+                                    </div>
+                                    <div class="invalid-feedback"
+                                         id="errorMessage{{ field.name }}"></div>
+                                </div>
+                            </div>
+                        {% elif field.name in "'fecha_desde', 'fecha_hasta', 'publicado', 'publicar'" %}
+                            <div class="col-lg-{{ field.field.widget.attrs.col }}">
+                                <div class="form-group">
+                                    <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    <div class="invalid-feedback" id="errorMessage{{ field.name }}"></div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-lg-{{ field.field.widget.attrs.col }}">
+                                <div class="form-group">
+                                    <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    <div class="invalid-feedback" id="errorMessage{{ field.name }}"></div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <a class="btn btn-danger" style="color: #ffffff;" href="{{ ruta }}">
+                        <i class="fa fa-window-close"></i> Cancelar
+                    </a>
+                    <button {% if action != 'ver' %}type="submit" id="submit"{% else %}disabled{% endif %}
+                            class="btn btn-success">
+                        <i class="fa fa-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block jscript %}
+    {{ form.media }}
+    <script src="/static/validaciones/funciones.js?v=2.2"></script>
+    <script src="/static/assets/plugins/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+{% endblock %}

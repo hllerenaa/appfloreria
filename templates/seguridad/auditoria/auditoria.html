@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- Filters -->
+    <div class="container-fluid px-0">
+        <form method="GET" action="{{ ruta }}">
+            <div class="form-row align-items-center">
+                <div class="col-md mb-4">
+                    <label class="form-label">Desde</label>
+                    <input type="date" id="user-list-latest-activity" name="desde" value="{{ desde }}"
+                           class="form-control" placeholder="Buscar">
+                </div>
+                <div class="col-md mb-4">
+                    <label class="form-label">Hasta</label>
+                    <input type="date" id="user-list-latest-activity" name="hasta" value="{{ hasta }}"
+                           class="form-control" placeholder="Buscar">
+                </div>
+                <div class="col-md mb-4">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" id="user-list-latest-activity" name="criterio" value="{{ criterio }}"
+                           class="form-control" placeholder="Buscar">
+                </div>
+                <div class="col-md col-xl-2 mb-4">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button class="btn btn-secondary btn-block">Buscar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- / Filters -->
+
+    <div class="panel panel-default">
+
+
+
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table id="tabla" class="table table-hover table-td-valign-middle table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="column-title">Fecha</th>
+                        <th class="column-title">Hora</th>
+{#                        <th class="column-title">Modulo</th>#}
+                        <th class="column-title">Registro</th>
+                        <th class="column-title"><span class="nobr">Username</span></th>
+                        <th class="column-title">Grupo</th>
+                        <th class="column-title">SuperAdmin</th>
+                        <th class="column-title">Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in listado %}
+                        <tr>
+                            <td>{{ p.fecha|date:"d/M/Y" }}</td>
+                            <td>{{ p.fecha|date:"H:i" }}</td>
+{#                            <td>{% if p.modelo %}{{ p.modelo }}{% else %}{% endif %}</td>#}
+                            <td>{{ p.registroname }}</td>
+                            <td>{{ p.usuario.username }}</td>
+                            {#                            <td>{% if p.usuario.is_staff == True %}#}
+                            {#                                SI#}
+                            {#                            {% else %}#}
+                            {#                                NO{% endif %}</td>#}
+                            <td>{{ p.usuario.groups.all.first.name }}</td>
+                            <td>{% if p.usuario.is_superuser == True %}
+                                SI
+                            {% else %}
+                                NO{% endif %}</td>
+                            <td>
+                                {% if p.accion == 'CHANGE' %}
+                                    <a {% if p.datos_json and p.datos_json != '[]' %}onclick="ver_detalle_aud({{ p.pk }})" title="Click para ver detalle"{% endif %}
+                                       href="javascript:void(0)" class="badge badge-info" style="font-size: 15px;">EDITADO</a>
+                                {% elif p.accion == 'ADD' %}
+                                    <a {% if p.datos_json and p.datos_json != '[]' %}onclick="ver_detalle_aud({{ p.pk }})" title="Click para ver detalle"{% endif %}
+                                       href="javascript:void(0)" class="badge badge-success" style="font-size: 15px;">AGREGADO</a>
+                                {% elif p.accion == 'DELETE' %}
+                                    <a {% if p.datos_json and p.datos_json != '[]' %}onclick="ver_detalle_aud({{ p.pk }})" title="Click para ver detalle"{% endif %}
+                                       href="javascript:void(0)" class="badge badge-danger" style="font-size: 15px;">ELIMINADO</a>
+                                {% else %}
+                                    <a {% if p.datos_json and p.datos_json != '[]' %}onclick="ver_detalle_aud({{ p.pk }})" title="Click para ver detalle"{% endif %}
+                                       href="javascript:void(0)" class="badge badge-default"
+                                       style="font-size: 15px;">{{ p.accion }}</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- paginacion  -->
+                {% include 'paginacion.html' %}
+                <!-- final de la paginacion  -->
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalDetalle">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modalDetalleContenido" class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jscript %}
+    <script>
+        const modalDetalle = $('#modalDetalle');
+        const modalDetalleContenido = $('#modalDetalleContenido');
+        function ver_detalle_aud(pk) {
+            getPromise('{{ ruta }}', {action: 'ver_detalle_aud', pk: pk}).then(function (data) {
+                if(data.resp){
+                    modalDetalleContenido.html(data.contenido);
+                    modalDetalle.modal('show');
+                }else{
+                    mensajeDanger("No hay detalle.");
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
