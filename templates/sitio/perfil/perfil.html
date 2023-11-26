@@ -25,22 +25,6 @@
                             <input class="form-control" type="text" value="{{ request.user.last_name }}" required
                                    id="id_last_name" name="last_name" placeholder="Apellidos">
                         </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="fn">Lugar de trabajo</label>
-                            <input class="form-control" type="text" value="{{ request.user.lugartrabajo|default:'N/A' }}"
-                                   id="id_lugartrabajo" name="lugartrabajo" placeholder="Lugar de trabajo">
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="fn">Posicion laboral</label>
-                            <input class="form-control" type="text" value="{{ request.user.posicionlaboral|default:'N/A' }}"
-                                   id="id_posicionlaboral" name="posicionlaboral" placeholder="Posicion laboral">
-                        </div>
-                        <div class="col-sm-12">
-                            <label class="form-label" for="fn">Fecha Nacimiento <span class="text-danger">*</span></label>
-                            <input required class="form-control" type="date" value="{{ fecha_nacimiento }}"
-                                   id="id_fechanacimiento" placeholder="Fecha Nacimiento"
-                                   name="fechanacimiento" autocomplete="off">
-                        </div>
                         <div class="col-sm-12">
                             <label class="form-label" for="email">Ubicación <span class="text-danger">*</span></label>
                             <select class="form-select" id="id_ciudad" name="ciudad" required>

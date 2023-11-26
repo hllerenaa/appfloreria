@@ -37,12 +37,8 @@ def perfil(request):
                             usuario = Usuario.objects.get(pk=int(request.user.pk))
                             usuario.first_name = request.POST['first_name']
                             usuario.last_name = request.POST['last_name']
-                            usuario.lugartrabajo = request.POST['lugartrabajo']
-                            usuario.posicionlaboral = request.POST['posicionlaboral']
                             usuario.telefono = request.POST['telefono']
                             usuario.ciudad_id =  request.POST['ciudad']
-                            fecha_nacimiento_ = request.POST["fechanacimiento"]
-                            usuario.fecha_nacimiento = fecha_nacimiento_
                             usuario.save()
                             messages.success(request, 'Información de perfil actualizada')
                             res_json.append({'error': False, "to": request.path})
