@@ -12,7 +12,7 @@ from core.validadores import es_cedula, es_ruc, es_pasaporte
 class UserForm(ModelFormBase):
     pais = forms.ModelChoiceField(queryset=Pais.objects.filter(status=True).order_by('nombre'), required=False,
                                        label="País")
-    provincia = forms.ModelChoiceField(queryset=Provincia.objects.none(), required=False, label="Provincia")
+    provincia = forms.ModelChoiceField(queryset=Provincia.objects.filter(status=True), required=False, label="Provincia")
 
     class Meta:
         model = Usuario
@@ -100,7 +100,7 @@ class UserForm(ModelFormBase):
 class ClienteForm(ModelFormBase):
     pais = forms.ModelChoiceField(queryset=Pais.objects.filter(status=True).order_by('nombre'), required=False,
                                        label="País")
-    provincia = forms.ModelChoiceField(queryset=Provincia.objects.none(), required=False, label="Provincia")
+    provincia = forms.ModelChoiceField(queryset=Provincia.objects.filter(status=True), required=False, label="Provincia")
 
     class Meta:
         model = Usuario

@@ -16,50 +16,6 @@ from core.models_utils import FileNameUploadToPath
 from appfloreria.settings import AUTH_USER_MODEL
 
 
-class UsuarioNotificacion(ModeloBase):
-    user_envia = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="fk_user_envia", verbose_name="Usuario que envió la notificación", null=True, blank=True)
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Usuario que recibe la notificación", related_name='+')
-    url = models.CharField("Url", max_length=255)
-    tipo = models.CharField("Tipo", max_length=50, choices=(
-        ("OTROS", "Otros"),
-        ("COMPRA_DE_CITA", "Compra de una cita"),
-        ("SE_ACERCA_CITA", "Cita médica próxima a realizarse")
-    ), default="OTROS")
-    nombre = models.CharField("Nombre", max_length=255)
-    nombre_html = models.CharField("Nombre (HTML)", max_length=255, null=True, blank=True)
-    descripcion = models.TextField("Descripción", null=True, blank=True)
-    descripcion_html = models.TextField("Descripción (HTML)", null=True, blank=True)
-    visto = models.BooleanField(default=False)
-    mostrar_en_panel = models.BooleanField("¿Mostrar en panel?", default=False)
-
-    def __str__(self):
-        return "{} {} {}".format(self.user.username, self.nombre, self.url)
-
-    def get_nombre_html(self):
-        return mark_safe(self.nombre_html or self.nombre)
-
-    def get_descripcion_html(self):
-        return mark_safe(self.descripcion_html or self.descripcion)
-
-    def get_full_url(self):
-        from appfloreria.settings import URL_GENERAL
-        if self.url:
-            return URL_GENERAL + self.url
-        return "javascript:;"
-
-    def get_icon(self):
-        if self.tipo == "COMPRA_DE_CITA":
-            return "/static/iconos/pago.png"
-        if self.tipo == "SE_ACERCA_CITA":
-            return "/static/iconos/lista.png"
-        return "/static/iconos/info.png"
-
-    class Meta:
-        ordering = ('visto', '-pk',)
-        verbose_name = "Notificación"
-        verbose_name_plural = "Notificaciones"
-
-
 class ErrorLog(models.Model):
     usuario = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Usuario', blank=True, null=True, related_name='+')
     archivo = models.TextField(verbose_name='Archivo', blank=True, null=True)
