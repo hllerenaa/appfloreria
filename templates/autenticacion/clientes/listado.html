@@ -128,13 +128,6 @@
                                            href="?pk={{ l.pk }}&action=change&{{ dict_url_vars }}">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
-                                        {% if not l.idusermoodle %}
-                                            <a class="dropdown-item"
-                                               onclick="crearusuarioMoodle({{ l.pk }}, '{{ l }}', 'crearusuariomoodle', '{{ dict_url_vars }}')"
-                                               href="javascript:void(0);">
-                                                <i class="fas fa-chalkboard-teacher"></i> Crear Usuario Moodle
-                                            </a>
-                                        {% endif %}
                                         {% if not l.es_administrativo %}
                                             <a class="dropdown-item"
                                                onclick="crearperfiladm({{ l.pk }}, '{{ l }}', 'crearperfiladm', '{{ dict_url_vars }}')"

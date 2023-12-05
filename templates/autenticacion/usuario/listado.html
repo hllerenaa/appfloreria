@@ -117,7 +117,7 @@
                             <b>Perfil Administrativo:</b> {% if l.es_administrativo %}
                             <i class="fas fa-check-circle text-success"></i>{% else %}
                             <i class="fas fa-times-circle text-danger"></i>{% endif %}<br>
-                            <b>Perfil Estudiante:</b> {% if l.es_cliente %}
+                            <b>Perfil Cliente:</b> {% if l.es_cliente %}
                             <i class="fas fa-check-circle text-success"></i>{% else %}
                             <i class="fas fa-times-circle text-danger"></i>{% endif %}
                         </td>
@@ -135,18 +135,11 @@
                                            href="?pk={{ l.pk }}&action=change&{{ dict_url_vars }}">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
-                                        {% if not l.idusermoodle %}
-                                            <a class="dropdown-item"
-                                               onclick="crearusuarioMoodle({{ l.pk }}, '{{ l }}', 'crearusuariomoodle', '{{ dict_url_vars }}')"
-                                               href="javascript:void(0);">
-                                                <i class="fas fa-chalkboard-teacher"></i> Crear Usuario Moodle
-                                            </a>
-                                        {% endif %}
                                         {% if not l.es_cliente %}
                                             <a class="dropdown-item"
                                                onclick="crearperfilestudiante({{ l.pk }}, '{{ l }}', 'crearperfilestudiante', '{{ dict_url_vars }}')"
                                                href="javascript:void(0);">
-                                                <i class="fas fa-user-plus"></i> Crear Perfil Estudiante
+                                                <i class="fas fa-user-plus"></i> Crear Perfil Cliente
                                             </a>
                                         {% endif %}
                                         <a class="dropdown-item" title="Cambiar Contraseña"
@@ -269,7 +262,7 @@
                 <form id="frmEstudiante" method="post" enctype="multipart/form-data">{% csrf_token %}
                     <input type="hidden" id="id_dict_url_vars" name="dict_url_vars" value="">
                     <div class="modal-header">
-                        <h4 class="modal-title">¿Seguro desea crear perfil estudiante para este usuario?</h4>
+                        <h4 class="modal-title">¿Seguro desea crear perfil cliente para este usuario?</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                             <i class="fas fa-times"></i>
                         </button>
@@ -277,7 +270,7 @@
                     <div class="modal-body">
                         <div class="alert alert-primary m-b-0">
                             <h5><i class="fa fa-info-circle"></i> Atención!</h5>
-                            <p>Estas a punto de crear perfil estudiante para '<b id="estudianteNombre"></b>'</p>
+                            <p>Estas a punto de crear perfil cliente para '<b id="estudianteNombre"></b>'</p>
                             <input type="hidden" name="id" id="id">
                             <input type="hidden" name="action" id="action">
                         </div>
