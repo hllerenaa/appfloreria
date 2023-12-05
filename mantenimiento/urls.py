@@ -4,7 +4,7 @@ from .view_redessociales import redessocialesView
 
 mantenimiento_urls = (
     {
-        "nombre": "Carousel View",
+        "nombre": "Carrousel",
         "url": 'carousel/',
         "vista": carrouselView
     },
