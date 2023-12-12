@@ -37,7 +37,10 @@
                     <thead>
                     <tr>
                         <th class="text-center">
-                            Foto
+                            Foto 1
+                        </th>
+                        <th class="text-center">
+                            Foto 2
                         </th>
                         <th class="text-center">
                             Nombre
@@ -65,10 +68,15 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
+                                {% if l.foto2 %}
+                                    <img src="/media/{{ l.foto2 }}" class="img-thumbnail" width="60px">
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
                                 {{ l.nombre }}
                             </td>
                             <td style="text-align: center">
-                                {{ l.descripcion }}
+                                {{ l.descripcion|safe }}
                             </td>
                             <td class="text-center">
                                 {{ l.precio }}

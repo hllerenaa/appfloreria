@@ -52,10 +52,11 @@ class Carousel(ModeloBase):
 
 
 class Producto(ModeloBase):
+    orden = models.IntegerField(default=0, verbose_name='Orden de Visualización')
     nombre = models.CharField(max_length=1000, blank=True, null=True, verbose_name="Nombre")
+    precio = models.DecimalField(default=0, max_digits=19, decimal_places=2, verbose_name="Pvp", validators=[MinValueValidator(Decimal('0'))])
     slug = models.SlugField(null=True, blank=True, editable=False)
     descripcion = models.TextField(null=True, blank=True, verbose_name="Descripción")
-    precio = models.DecimalField(default=0, max_digits=19, decimal_places=2, verbose_name="Pvp", validators=[MinValueValidator(Decimal('0'))])
     foto1 = models.ImageField(upload_to="fotoproductos/1/", blank=True, null=True, verbose_name='Foto 1 900x1200px')
     foto2 = models.ImageField(upload_to="fotoproductos/2/", blank=True, null=True, verbose_name='Foto 2 900x1200px')
     foto3 = models.ImageField(upload_to="fotoproductos/3/", blank=True, null=True, verbose_name='Foto 3 900x1200px')

@@ -80,4 +80,33 @@
     {{ form.media }}
     <script src="/static/validaciones/funciones.js?v=2.2"></script>
     <script src="/static/assets/plugins/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+    <script>
+        $(function () {
+            $("input:file").dropify({
+                messages: {
+                    default: 'Drag and drop a file or click here.',
+                    replace: 'Drag and drop a file or click here.',
+                    remove: 'Remove',
+                },
+                imgFileExtensions: ["jpg", "jpeg", "png", "tiff", "jfif", "svg"]
+            });
+        })
+    </script>
+    <link href="/static/assets/plugins/summernote/dist/summernote.css" rel="stylesheet"/>
+    <script src="/static/assets/plugins/summernote/dist/summernote.min.js"></script>
+    <script>
+        $(function () {
+            $('#id_descripcion').summernote({
+                placeholder: 'Enter description',
+                height: '250px',
+            });
+
+             $("#id_descripcion").on("summernote.enter", function(we, e) {
+                 $(this).summernote("pasteHTML", "<br><br>");
+                 e.preventDefault();
+                    });
+        })
+
+
+    </script>
 {% endblock %}

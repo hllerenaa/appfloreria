@@ -1,0 +1,188 @@
+{% extends 'sitio/base.html' %}
+{% block head %}
+    <style>
+        .active > .page-link, .page-link.active {
+            z-index: 3;
+            background-color: #e72463 !important;
+            border-color: #e72463 !important;
+            color: white !important;
+        }
+
+        .page-link {
+            color: #e72463 !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="breadcrumbs-area position-relative">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="breadcrumb-content position-relative section-content">
+                        <h3 class="title-3">Catálogo de Productos</h3>
+                        <ul>
+                            <li><a href="/">Inicio</a></li>
+                            <li>Catálogo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shop-main-area">
+        <div class="container container-default custom-area">
+            <div class="row flex-row-reverse">
+                <div class="col-lg-9 col-12 col-custom widget-mt">
+                    <div class="row shop_wrapper grid_3">
+                        {% for producto in listado %}
+                            <div class="col-md-6 col-sm-6 col-lg-4 col-custom product-area">
+                                <div class="product-item">
+                                    <div class="single-product position-relative mr-0 ml-0">
+                                        <div class="product-image">
+                                            <a class="d-block"
+                                               href="{{ request.path }}?action=ver&id={{ producto.slug }}">
+                                                <img src="/media/{{ producto.foto1 }}" alt=""
+                                                     class="product-image-1 w-100">
+                                                <img src="/media/{{ producto.foto2 }}" alt=""
+                                                     class="product-image-2 position-absolute w-100">
+                                            </a>
+                                            <div class="add-action d-flex flex-column position-absolute">
+                                                <a href="#modalProducto{{ producto.id }}" title="Vista Previa"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#modalProducto{{ producto.id }}">
+                                                    <i class="lnr lnr-eye" data-toggle="tooltip" data-placement="left"
+                                                       title="Vista Previa"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="product-content">
+                                            <div class="product-title">
+                                                <h4 class="title-2"><a
+                                                        href="{{ request.path }}?action=ver&id={{ producto.slug }}">{{ producto.nombre }}</a>
+                                                </h4>
+                                            </div>
+                                            {% if request.user.is_authenticated %}
+                                                <div class="price-box">
+                                                    <span class="regular-price ">${{ producto.precio }}</span>
+                                                </div>
+                                            {% endif %}
+                                            <a href="{{ request.path }}?action=ver&id={{ producto.slug }}"
+                                               class="btn product-cart">Ver Producto</a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal flosun-modal fade" id="modalProducto{{ producto.id }}" tabindex="-1"
+                                 role="dialog"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <button type="button" class="close close-button" data-bs-dismiss="modal"
+                                                aria-label="Close">
+                                            <span class="close-icon" aria-hidden="true">x</span>
+                                        </button>
+                                        <div class="modal-body">
+                                            <div class="container-fluid custom-area">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-custom">
+                                                        <div class="modal-product-img">
+                                                            <a class="w-100" href="#">
+                                                                <img class="w-100"
+                                                                     src="/media/{{ producto.foto1 }}"
+                                                                     alt="Product">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 col-custom">
+                                                        <div class="modal-product">
+                                                            <div class="product-content">
+                                                                <div class="product-title">
+                                                                    <h4 class="title">{{ producto.nombre }}</h4>
+                                                                </div>
+                                                                {% if request.user.is_authenticated %}
+                                                                    <div class="price-box">
+                                                                        <span class="regular-price ">${{ producto.precio }}</span>
+                                                                    </div>
+                                                                {% endif %}
+                                                                <p class="desc-content">
+                                                                    {{ producto.descripcion|safe }}
+                                                                </p><br>
+                                                                <div class="quantity-with-btn">
+                                                                    <div class="add-to_btn">
+                                                                        <a class="btn product-cart button-icon flosun-button dark-btn"
+                                                                           href="{{ request.path }}?action=ver&id={{ producto.slug }}">Ver
+                                                                            Producto</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <center>
+                                {% include "paginacion.html" %}
+                            </center>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-12 col-custom">
+                    <aside class="sidebar_widget widget-mt">
+                        <div class="widget_inner">
+                            <div class="widget-list widget-mb-1">
+                                <h3 class="widget-title">Buscar</h3>
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Buscar por nombre"
+                                               aria-label="Search Our Store">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget-list mb-0">
+                                <h3 class="widget-title">Productos Recientes</h3>
+                                <div class="sidebar-body">
+                                    {% for l in listaRecientes %}
+                                        <div class="sidebar-product align-items-center">
+                                            <a href="{{ request.path }}?action=ver&id={{ l.slug }}" class="image">
+                                                <img src="/media/{{ l.foto1 }}" alt="product">
+                                            </a>
+                                            <div class="product-content">
+                                                <div class="product-title">
+                                                    <h4 class="title-2"><a
+                                                            href="{{ request.path }}?action=ver&id={{ l.slug }}">{{ l.nombre }}</a>
+                                                    </h4>
+                                                </div>
+                                                {% if request.user.is_authenticated %}
+                                                    <div class="price-box">
+                                                        <span class="regular-price ">${{ l.precio }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br>
+    <br><br><br>
+{% endblock %}

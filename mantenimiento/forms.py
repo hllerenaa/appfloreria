@@ -39,12 +39,16 @@ class RedesForm(ModelFormBase):
 class ProductoForm(ModelFormBase):
     class Meta:
         model = Producto
-        exclude = ('usuario_creacion', 'fecha_registro', 'hora_registro', 'status', 'slug')
+        exclude = ('usuario_creacion','fecha_registro', 'hora_registro', 'status', 'slug',)
 
-        def __init__(self, *args, **kwargs):
-            ver = kwargs.pop('ver') if 'ver' in kwargs else False
-            instancia = kwargs["instance"] if 'instance' in kwargs else None
-            super(ProductoForm, self).__init__(*args, **kwargs)
-            for k, v in self.fields.items():
-                if not k in ('foto2','foto3','foto4','activo',):
-                    self.fields[k].widget.attrs['required'] = "true"
+    def __init__(self, *args, **kwargs):
+        ver = kwargs.pop('ver') if 'ver' in kwargs else False
+        instancia = kwargs["instance"] if 'instance' in kwargs else None
+        super(ProductoForm, self).__init__(*args, **kwargs)
+        for k, v in self.fields.items():
+            if k in ('foto1', 'foto2', 'foto3', 'foto4', ):
+                self.fields[k].widget.attrs['col'] = "6"
+            if k in ('orden', 'nombre', 'precio'):
+                self.fields[k].widget.attrs['col'] = "4"
+            if k in ('descripcion', 'activo'):
+                self.fields[k].widget.attrs['col'] = "12"
