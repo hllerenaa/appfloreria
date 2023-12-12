@@ -1,6 +1,7 @@
 from django.urls import path, re_path, include
 from .view_carrousel import carrouselView
 from .view_redessociales import redessocialesView
+from .view_producto import productoView
 
 mantenimiento_urls = (
     {
@@ -12,6 +13,11 @@ mantenimiento_urls = (
         "nombre": "Redes Sociales",
         "url": 'redessociales/',
         "vista": redessocialesView
+    },
+    {
+        "nombre": "Producto",
+        "url": 'productos/',
+        "vista": productoView
     },
 )
 

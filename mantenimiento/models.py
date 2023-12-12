@@ -71,8 +71,12 @@ class Producto(ModeloBase):
     def __str__(self):
         return '{}'.format(self.nombre)
 
+    def get_foto1(self):
+        if self.foto1:
+            imagen = self.foto1.url
+        return imagen
+
     def save(self, *args, **kwargs):
-        self.codigo = re.sub("\s+", " ", (self.codigo or '').strip()).upper()
         super(Producto, self).save(*args, **kwargs)
         self.slug = slugify(self.nombre)
         if Producto.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
