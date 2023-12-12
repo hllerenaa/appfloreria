@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="GET">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col-md-6 col-sm-12 offset-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Buscar" aria-label="Buscar"
+                               aria-describedby="button-addon2" name="criterio" value="{{ criterio }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" id="button-addon2"><i
+                                    class="fa fa-search"></i></button>
+                            {% if url_vars %}
+                                <a title="Ver todo" href="{{ ruta }}" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if can_add %}
+        <div class="mb-3">
+            <a href="?action=add" class="btn btn-success"><i class="fas fa-plus-circle mr-2"></i> Nuevo Registro</a>
+        </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+
+
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table id="tabla" class="table table-hover table-td-valign-middle table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="text-center">
+                            Foto
+                        </th>
+                        <th class="text-center">
+                            Nombre
+                        </th>
+                        <th class="text-center">
+                            Descripción
+                        </th>
+                        <th width="20%" class="text-center">
+                            Precio
+                        </th>
+                        <th class="text-center">
+                            Visible
+                        </th>
+                        <th class="text-center">
+                            Acción
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for l in listado %}
+                        <tr>
+                            <td class="text-center">
+                                {% if l.foto1 %}
+                                    <img src="{{ l.get_foto1 }}" class="img-thumbnail" width="60px">
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {{ l.nombre }}
+                            </td>
+                            <td style="text-align: center">
+                                {{ l.descripcion }}
+                            </td>
+                            <td class="text-center">
+                                {{ l.precio }}
+                            </td>
+                            <td style="text-align: center">
+                                {% if l.activo %}
+                                    <i class="fa fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fa fa-times-circle text-danger"></i>
+                                {% endif %}
+
+                            </td>
+                            <td class="text-center">
+                                {% if can_change %}
+                                    <a class="btn btn-mini btn-info" title="Editar {{ modulo }}"
+                                       href="?pk={{ l.pk }}&action=change">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                {% endif %}
+                                {% if can_delete %}
+                                    <a class="btn btn-mini btn-danger" title="Eliminar {{ modulo }}"
+                                       onclick="eliminarajax({{ l.pk }}, '{{ l.nombre }}', 'delete')"
+                                       href="javascript:void(0);">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include "paginacion.html" %}
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/static/lightbox/css/lightbox.min.css">
+    <script src="/static/lightbox/js/lightbox-plus-jquery.min.js"></script>
+{% endblock %}
+
+{% block jscript %}
+{% endblock %}
