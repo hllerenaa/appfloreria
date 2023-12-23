@@ -10,7 +10,7 @@ from appfloreria import settings
 from core.email_config import send_html_mail
 from core.funciones import addData, mi_paginador, get_decrypt, get_client_ip
 from core.notificacion_config import enviar_not_push
-from mantenimiento.models import Carousel
+from mantenimiento.models import Carousel, Producto
 from seguridad.models import *
 from sitio.models import VisitaEntorno
 
@@ -41,4 +41,5 @@ def index(request):
                 VisitaEntorno.objects.create(fecha_visita=datetime.now().date(), ip=ipresult, hora_visita=datetime.now().time(), user_id=request.user.pk,
                                              dispositivo=dispositivo)
         data['listcarousel'] = listcarousel = Carousel.objects.filter(status=True, publicado=True).order_by('orden')
+        data['listproductos'] = listproductos = Producto.objects.filter(status=True, activo=True).order_by('?')[:10]
         return render(request, 'sitio/landing.html', data)

@@ -105,6 +105,7 @@ class Configuracion(models.Model):
     descripcion = models.CharField(max_length=1000, blank=True, null=True, verbose_name='Descripción')
     telefono = models.CharField(max_length=20, blank=True, null=True, verbose_name='Teléfono Empresa')
     email = models.CharField(max_length=100, blank=True, null=True, verbose_name='Email Empresa')
+    direccion = models.CharField(max_length=100, blank=True, null=True, verbose_name='Dirección Empresa')
     textoprincipal = models.TextField(blank=True, null=True, verbose_name='Texto Principal')
     textosecundario = models.TextField(blank=True, null=True, verbose_name='Texto Secundario')
     terminosycondiciones = models.TextField(blank=True, null=True, verbose_name='Terminos y Condiciones')

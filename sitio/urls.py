@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.urls import path
 
 from .index import index
+from .view_carrito import carritoView
 from .view_catalogo import catalogoView
 from .view_registro import registro
 from .view_login import login_tienda, logout_tienda
@@ -26,4 +27,5 @@ urlpatterns = [
     url(r'^restoreusername/', recordarusername),
     url(r'^changepass/', changepass),
     url(r'^catalogo/', catalogoView),
+    url(r'^carrito/', carritoView),
 ]

@@ -67,14 +67,21 @@ class Producto(ModeloBase):
         return self.productoitems_set.values('id').filter(status=True).count()
 
     def listitems(self):
-        return self.productoitems_set.filter(status=True, vigente=True).order_by('orden')
+        return self.productoitems_set.filter(status=True, visible=True).order_by('orden')
 
     def __str__(self):
         return '{}'.format(self.nombre)
 
     def get_foto1(self):
+        imagen = ''
         if self.foto1:
             imagen = self.foto1.url
+        return imagen
+
+    def get_foto2(self):
+        imagen = ''
+        if self.foto2:
+            imagen = self.foto2.url
         return imagen
 
     def save(self, *args, **kwargs):
@@ -94,10 +101,17 @@ class ProductoItems(ModeloBase):
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Producto')
     nombre = models.CharField(max_length=1000, null=True, blank=True, verbose_name='Nombres')
     precio = models.DecimalField(default=0, max_digits=19, decimal_places=2, verbose_name="Pvp", validators=[MinValueValidator(Decimal('0'))])
+    foto1 = models.ImageField(upload_to="adicionalesitems/1/", blank=True, null=True, verbose_name='Foto 1 900x1200px')
     visible = models.BooleanField(default=True, verbose_name='Visible')
 
-    def str_vigente(self):
-        return 'fa fa-check-circle text-success' if self.vigente else 'fa fa-times-circle text-danger'
+    def get_foto1(self):
+        imagen = ''
+        if self.foto1:
+            imagen = self.foto1.url
+        return imagen
+
+    def str_visible(self):
+        return 'fa fa-check-circle text-success' if self.visible else 'fa fa-times-circle text-danger'
 
     def __str__(self):
         return "{}, {} ({})".format(self.producto, self.nombre, self.orden)

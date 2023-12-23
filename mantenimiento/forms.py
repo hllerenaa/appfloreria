@@ -52,3 +52,16 @@ class ProductoForm(ModelFormBase):
                 self.fields[k].widget.attrs['col'] = "4"
             if k in ('descripcion', 'activo'):
                 self.fields[k].widget.attrs['col'] = "12"
+
+
+class ItemsAdicionalesForm(ModelFormBase):
+    class Meta:
+        model = ProductoItems
+        exclude = ('usuario_creacion','fecha_registro', 'hora_registro', 'status', 'producto',)
+
+    def __init__(self, *args, **kwargs):
+        ver = kwargs.pop('ver') if 'ver' in kwargs else False
+        instancia = kwargs["instance"] if 'instance' in kwargs else None
+        super(ItemsAdicionalesForm, self).__init__(*args, **kwargs)
+        for k, v in self.fields.items():
+            self.fields[k].widget.attrs['col'] = "6"

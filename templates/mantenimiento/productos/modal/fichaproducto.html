@@ -1,0 +1,108 @@
+<style>
+    .product-card {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .product-images {
+        flex: 50%; /* Ajusta este valor según prefieras */
+        text-align: center;
+    }
+
+    {#.img-thumbnail {#}
+    {#    width: 100px; /* O el tamaño que prefieras */#}
+    {#    height: auto;#}
+    {#    margin: 5px;#}
+    {#    border: 1px solid #ddd;#}
+    {#    border-radius: 4px;#}
+    {# }#}
+
+    .product-details {
+        flex: 50%;
+        padding: 10px;
+    }
+
+    .product-details h2 {
+        margin-top: 0;
+    }
+
+    /* Ajustes para visualización en móviles */
+    @media (max-width: 600px) {
+        .product-card {
+            flex-direction: column;
+        }
+
+        .product-images, .product-details {
+            flex: 100%;
+        }
+    }
+
+</style>
+
+<h2>Detalle del Producto</h2>
+
+<div class="product-card">
+    <div class="product-images">
+        <img src="{{ producto.foto1.url }}" alt="Foto 1" class="img-thumbnail" style="width: 100px;">
+        <img src="{{ producto.foto2.url }}" alt="Foto 2" class="img-thumbnail" style="width: 100px;">
+        <br>
+        <img src="{{ producto.foto3.url }}" alt="Foto 3" class="img-thumbnail" style="width: 100px;">
+        <img src="{{ producto.foto4.url }}" alt="Foto 4" class="img-thumbnail" style="width: 100px;">
+    </div>
+    <div class="product-details">
+        <h2>{{ producto.nombre }}</h2>
+        <p><strong>Orden de Visualización:</strong> {{ producto.orden }}</p>
+        <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+        <p><strong>Descripción:</strong> {{ producto.descripcion|safe }}</p>
+        <p><strong>Activo:</strong> {{ producto.activo|yesno:"Sí,No" }}</p>
+    </div>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-td-valign-middle table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th class="text-center">Orden</th>
+            <th class="text-center">Imagen</th>
+            <th class="text-center">Item</th>
+            <th class="text-center">Precio</th>
+            <th class="text-center">Visible?</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for l in listado %}
+            <tr>
+                <td class="text-center">
+                    <b>{{ l.orden }}</b>
+                </td>
+                <td class="text-center">
+                    <a href="{{ l.get_foto1 }}" data-lightbox="roadtrip"
+                       title="{{ l.nombre }}">
+                        <img src="{{ l.get_foto1 }}" class="img-thumbnail" width="60px">
+                    </a>
+                </td>
+                <td class="text-center">
+                    {{ l.nombre }}
+                </td>
+                <td class="text-center">
+                    $ {{ l.precio }}
+                </td>
+                <td class="text-center">
+                    <i class="{{ l.str_visible|safe }}"></i>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="15" style="text-align: center">
+                    <div class="alert alert-danger fade show">No existen datos</div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

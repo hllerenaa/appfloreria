@@ -45,11 +45,11 @@
                         <th class="text-center">
                             Nombre
                         </th>
-                        <th class="text-center">
-                            Descripción
-                        </th>
                         <th width="20%" class="text-center">
                             Precio
+                        </th>
+                        <th class="text-center">
+                            Items Adicionales
                         </th>
                         <th class="text-center">
                             Visible
@@ -63,23 +63,28 @@
                     {% for l in listado %}
                         <tr>
                             <td class="text-center">
-                                {% if l.foto1 %}
+                                <a href="{{ l.get_foto1 }}" data-lightbox="roadtrip"
+                                   title="{{ l.nombre }}">
                                     <img src="{{ l.get_foto1 }}" class="img-thumbnail" width="60px">
-                                {% endif %}
+                                </a>
                             </td>
                             <td class="text-center">
-                                {% if l.foto2 %}
-                                    <img src="/media/{{ l.foto2 }}" class="img-thumbnail" width="60px">
-                                {% endif %}
+                                <a href="{{ l.get_foto2 }}" data-lightbox="roadtrip"
+                                   title="{{ l.nombre }}">
+                                    <img src="{{ l.get_foto2 }}" class="img-thumbnail" width="60px">
+                                </a>
                             </td>
                             <td class="text-center">
                                 {{ l.nombre }}
                             </td>
-                            <td style="text-align: center">
-                                {{ l.descripcion|safe }}
-                            </td>
                             <td class="text-center">
                                 {{ l.precio }}
+                            </td>
+                            <td style="text-align: center">
+                                <a href="javascript:void(0)"
+                                   onclick="formModal('{{ l.pk }}', 'Ver Item', 'viewitems')">
+                                    <span class="label label-primary">{{ l.numitems }} Items</span>
+                                </a>
                             </td>
                             <td style="text-align: center">
                                 {% if l.activo %}
@@ -87,22 +92,34 @@
                                 {% else %}
                                     <i class="fa fa-times-circle text-danger"></i>
                                 {% endif %}
-
                             </td>
-                            <td class="text-center">
-                                {% if can_change %}
-                                    <a class="btn btn-mini btn-info" title="Editar {{ modulo }}"
-                                       href="?pk={{ l.pk }}&action=change">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                {% endif %}
-                                {% if can_delete %}
-                                    <a class="btn btn-mini btn-danger" title="Eliminar {{ modulo }}"
-                                       onclick="eliminarajax({{ l.pk }}, '{{ l.nombre }}', 'delete')"
-                                       href="javascript:void(0);">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                {% endif %}
+                            <td class="with-btn-group text-center" nowrap>
+                                <div class="btn-group dropleft">
+                                    <button type="button" class="btn btn-white btn-sm width-100 dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-angle-left mr-1"></i> Acción
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" title="Ver {{ modulo }}"
+                                           onclick="formModal('{{ l.pk }}', 'Ver Ficha', 'viewficha')"
+                                           href="javascript:void(0);">
+                                            <i class="fas fa-eye"></i> Ver Ficha
+                                        </a>
+                                        <a class="dropdown-item" title="Edit {{ modulo }}"
+                                           href="?id={{ l.pk }}&action=change">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a class="dropdown-item" title="Delete {{ modulo }}"
+                                           onclick="eliminarajax({{ l.pk }}, '{{ l.nombre }}', 'delete')"
+                                           href="javascript:void(0);">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                        <a class="dropdown-item"
+                                           href="?id={{ l.pk }}&action=itemsadicionales">
+                                            <i class="fas fa-list-check"></i> Configurar Items
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -113,9 +130,60 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalDetalle">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <form method="post" enctype="multipart/form-data" action="{{ ruta }}"
+                      class="form-horizontal form-label-left">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h4 class="modal-title"><b id="modalNombre"></b></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body detalleProd">
+                    </div>
+                    <div class="modal-footer" id="footerModalView">
+                        <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
+                                class="fa fa-window-close"></i>
+                            Cerrar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <link rel="stylesheet" href="/static/lightbox/css/lightbox.min.css">
     <script src="/static/lightbox/js/lightbox-plus-jquery.min.js"></script>
 {% endblock %}
 
 {% block jscript %}
+    <script>
+        function formModal(id, text, action,) {
+            pantallaespera()
+            $.ajax({
+                type: "GET",
+                url: `{{ request.path }}`,
+                data: {
+                    'action': action,
+                    'id': id,
+                },
+                success: function (data) {
+                    setTimeout($.unblockUI, 1);
+                    if (data.result) {
+                        $('#modalNombre').html(text);
+                        $('.detalleProd').html(data.data);
+                        $('#modalDetalle').modal({backdrop: 'static'}).modal('show');
+
+                    } else {
+                        mensajeWarning(data.message);
+                    }
+                },
+                error: function () {
+                    setTimeout($.unblockUI, 1);
+                    mensajeWarning("Error de conexión.");
+                },
+                dataType: "json"
+            });
+        }
+    </script>
 {% endblock %}
