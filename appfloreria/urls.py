@@ -24,6 +24,7 @@ from seguridad.urls import seguridad_urls
 from seguridad.view_index import index
 from django.conf.urls.static import static
 from core.consultas import consultas
+from venta.urls import venta_urls
 
 confi = Configuracion.get_instancia()
 icon_url = confi.ico.url if confi.ico else ""
@@ -66,6 +67,14 @@ urls_sistema = (
         "url": 'financiero/',
         "sub_urls": financiero_urls,
         "include": include('financiero.urls'),
+        "name": None,
+        "vista": None
+    },
+    {
+        "nombre": "Ventas",
+        "url": 'ventas/',
+        "sub_urls": venta_urls,
+        "include": include('venta.urls'),
         "name": None,
         "vista": None
     },

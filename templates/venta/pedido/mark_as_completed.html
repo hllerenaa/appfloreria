@@ -25,7 +25,7 @@
                             <div class="invoice border">
                                 <div class="invoice-header">
                                     <div class="invoice-from">
-                                        <small>Customer</small>
+                                        <small>Cliente</small>
                                         <address class="m-t-5 m-b-5">
                                             <strong class="text-inverse">{{ compra.user.get_full_name }}</strong><br/>
                                             <div class="row">
@@ -52,10 +52,10 @@
                                         </address>
                                     </div>
                                     <div class="invoice-date">
-                                        <small>Purchase #{{ compra.pk }}</small>
+                                        <small>Comprobante #{{ compra.pk }}</small>
                                         <div class="date text-inverse m-t-5">{{ compra.fecha_registro|date:'E d, Y' }}</div>
                                         <div class="invoice-detail">
-                                            <div>Payment method:</div>
+                                            <div>Metodo de Pago:</div>
                                             <div>{{ compra.get_icon }}
                                                 <strong>{{ compra.get_metodo_pago_display }}</strong></div>
                                         </div>
@@ -74,7 +74,7 @@
                                                     o
                                                     <a class="btn btn-danger btn-mini"
                                                        href="{{ compra.archivo_pago.url }}" target="_blank">
-                                                        <i class="fas fa-download"></i> Download
+                                                        <i class="fas fa-download"></i> Descargar
                                                     </a>
                                                 </div>
                                             {% else %}
@@ -91,8 +91,8 @@
                                         <table class="table table-invoice">
                                             <thead>
                                             <tr>
-                                                <th>DESCRIPTION</th>
-                                                <th class="text-center" width="10%">PRICE</th>
+                                                <th>Item</th>
+                                                <th class="text-center" width="10%">Precio</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -123,7 +123,7 @@
                                         <table class="table">
                                             <thead>
                                             <tr>
-                                                <th>DETAIL</th>
+                                                <th>Detalle</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -172,7 +172,7 @@
                                         <div class="invoice-price-left">
                                             <div class="invoice-price-row">
                                                 <div class="sub-price">
-                                                    <small>SUBTOTAL</small>
+                                                    <small>Subtotal</small>
                                                     <span class="text-inverse">{{ SIMBOLO_MONEDA }}{{ compra.subtotal|intcomma }}</span>
                                                 </div>
                                                 {% if compra.impuestos_ubicacion > 0 %}
@@ -181,7 +181,7 @@
                                                     </div>
                                                     <div class="sub-price">
                                                         <small>
-                                                            Tax for distance
+                                                            Precio de Envio
                                                         </small>
                                                         <span class="text-inverse">{{ SIMBOLO_MONEDA }}{{ compra.impuestos_ubicacion|intcomma }}</span>
                                                     </div>

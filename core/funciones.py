@@ -688,6 +688,56 @@ def codnombre(nombres, apellidos, user_pk=0):
     return codnombre
 
 
+def convertir_minutos(minutos, horas_por_dia=24):
+    # Hay 60 minutos en una hora y 24 horas en un día
+    minutos_por_hora = 60
+
+    # Calcula el número de días completos
+    dias = minutos // (minutos_por_hora * horas_por_dia)
+
+    # Calcula el número de minutos restantes después de contar los días
+    minutos_restantes = minutos % (minutos_por_hora * horas_por_dia)
+
+    # Calcula el número de horas completas en los minutos restantes
+    horas = minutos_restantes // minutos_por_hora
+
+    # Calcula el número de minutos restantes después de contar las horas
+    minutos_finales = minutos_restantes % minutos_por_hora
+
+    return dias, horas, minutos_finales
+
+
+def formatear_minutos_str(minutos, horas_por_dia=8):
+    days, hours, minutes = convertir_minutos(minutos, horas_por_dia)
+
+    # Construye la cadena de texto de salida
+    parts = []
+
+    if days == 1:
+        parts.append("1 dia")
+    elif days > 1:
+        parts.append(f"{days} dias")
+
+    if hours == 1:
+        parts.append("1 hora")
+    elif hours > 1:
+        parts.append(f"{hours} horas")
+
+    if minutes == 1:
+        parts.append("1 minuto")
+    elif minutes > 1:
+        parts.append(f"{minutes} minutos")
+
+    # Join the parts with commas and 'and' before the last element
+    if len(parts) > 1:
+        last = parts.pop()
+        return ', '.join(parts) + f' y {last}'
+    elif parts:
+        return parts[0]
+    else:
+        return "0 minutos"
+
+
 def formatear_nombres(cadena):
     import re
     return re.sub("\s+", " ", cadena.strip())

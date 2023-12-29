@@ -16,7 +16,7 @@
                 <div class="col-md-2">
                     <div class="input-group mb-3">
                         <select name="metodopago" id="id_metodopago" class="form-control select2"
-                                data-placeholder="Filter by Payment Method">
+                                data-placeholder="Filter by Metodo de Pago">
                             <option value="">All</option>
                             {% for l in METODO_PAGOS %}
                                 <option value="{{ l.0 }}"
@@ -59,44 +59,41 @@
 
         <div class="panel-body">
             <label class="label label-primary" style="font-size: 13px">Cant. {{ list_count }}</label>
-            <label class="label label-warning" style="font-size: 13px">Total. ${{ totalrecaudado }}</label>
-            <label class="label label-danger" style="font-size: 13px">Total. ${{ totalreversado }}</label>
-            <label class="label label-success" style="font-size: 13px">Total. ${{ totalvalido }}</label>
+            <label class="label label-warning tr" title="Total Recaudado" style="font-size: 13px">Total. ${{ totalrecaudado }}</label>
+            <label class="label label-danger tr" title="Total Devuelto" style="font-size: 13px">Total. ${{ totalreversado }}</label>
+            <label class="label label-success tr" title="Total Valido" style="font-size: 13px">Total. ${{ totalvalido }}</label>
             <table id="tabla" class="table table-hover table-td-valign-middle table-bordered">
                 <thead>
                 <tr>
                     <th class="text-center">
-                        Detail
+                        Detalle
                     </th>
                     <th class="text-center">
-                        Creation Date
+                        F. Creación
                     </th>
                     <th class="text-center">
-                        Customer
+                        Cliente
                     </th>
                     <th class="text-center">
-                        Items
+                        Comprobante
                     </th>
-                    {#                    <th class="text-center">#}
-                    {#                        Comprobante#}
-                    {#                    </th>#}
-                    {#                    <th class="text-center">#}
-                    {#                        Subtotal#}
-                    {#                    </th>#}
-                    {#                    <th class="text-center">#}
-                    {#                        Impuestos#}
-                    {#                    </th>#}
+                    <th class="text-center">
+                        Subtotal
+                    </th>
+                    <th class="text-center">
+                        Impuestos
+                    </th>
+                    <th class="text-center">
+                        Costo de Envio
+                    </th>
                     <th class="text-center">
                         Total
                     </th>
                     <th class="text-center">
-                        Payment method
+                        Estado
                     </th>
                     <th class="text-center">
-                        State
-                    </th>
-                    <th class="text-center">
-                        Action
+                        Acción
                     </th>
                 </tr>
                 </thead>
@@ -109,32 +106,14 @@
                             </div>
                             <div>
                                 {% if l.modo_pago %}
-                                   <span class="text-primary">Production</span>
+                                    <span class="text-primary">Producción</span>
                                 {% else %}
-                                    <span class="text-warning">Test</span>
+                                    <span class="text-warning">Prueba</span>
                                 {% endif %}
                             </div>
-                            <div>
-                                <b>Pilot: </b> {{ l.pilot_turn.pilot.username }} - {{ l.pilot_turn.pilot }}
-                            </div>
-                            <div>
-                                <b>Working Time: </b> {{ l.get_time_str }}
-                            </div>
-                            <div>
-                                <b>Driving Time: </b> {{ l.tiempo_de_viaje_str }}
-                            </div>
-                            <div>
-                                <b>Total Time: </b> {{ l.tiempo_total_de_trabajo_str }}
-                            </div>
-                            <div>
-                                <h5>
-                                {% for f in l.get_fechas_de_trabajo_dict.dates %}
-                                    <span class="badge badge-warning text-dark mr-1">
-                                        <b>{{ f.festimada|date:'l d/M/Y' }}</b>
-                                    </span>
-                                {% endfor %}
-                                </h5>
-                            </div>
+                            {#                            <div>#}
+                            {#                                <b>Driving Time: </b> {{ l.tiempo_de_viaje_str }}#}
+                            {#                            </div>#}
                         </td>
                         <td class="text-center">
                             {{ l.fecha_registro|date:'d/M/Y' }}<br>
@@ -152,40 +131,39 @@
                                 {{ l.user.ciudad.provincia.pais.nombre }}
                             {% endif %}
                         </td>
-                        <td class="text-center">
-                            {% for item in l.get_detalle %}
-                                <span>{{ item.item.nombre }}</span>
-                            {% endfor %}
-                        </td>
-                        {#                        <td style="width: 15%">#}
-                        {#                            {% if l.entidad_fin %}#}
-                        {#                                <i class="fa fa-piggy-bank"></i> {{ l.entidad_fin }}#}
-                        {#                            {% else %}#}
-                        {#                                {{ l.comprobante|default:'---' }}#}
-                        {#                            {% endif %}#}
-                        {#                        </td>#}
-                        {#                        <td class="text-center">#}
-                        {#                            $ {{ l.subtotal|intcomma }}#}
-                        {#                        </td>#}
-                        {#                        <td class="text-center">#}
-                        {#                            $ {{ l.impuestos|intcomma }}#}
-                        {#                        </td>#}
-                        <td class="text-center" style="width: 10%">
-                            <b>$ {{ l.total|intcomma }}</b>
-                        </td>
-                        <td class="text-center" style="font-size: 14px">
+                        <td style="width: 15%; text-align: center">
                             {{ l.get_icon }} {{ l.get_metodo_pago_display }}
                             {% if l.pago_reversado %}<br>
                                 <span class="text-danger">
                                     <i class="fa-solid fa-money-bill-transfer"></i> Reverse payment <br> {{ l.fecha_reversado|date:'d/M/Y H:i' }}
                                 </span>
                             {% endif %}
+                            <hr>
+                            {% if l.entidad_fin %}
+                                <i class="fa fa-piggy-bank"></i> {{ l.entidad_fin }}
+                            {% else %}
+                                {{ l.comprobante|default:'---' }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            $ {{ l.subtotal|intcomma }}
+                        </td>
+                        <td class="text-center">
+                            $ {{ l.impuestos|intcomma }}
+                        </td>
+                        <td class="text-center">
+                            $ {{ l.impuestos_ubicacion|intcomma }}
+                        </td>
+                        <td class="text-center" style="width: 10%">
+                            <b>$ {{ l.total|intcomma }}</b>
                         </td>
                         <td class="text-center">
                             {{ l.estado_pedido }}
                             <div>
                                 {% if l.trabajo_completado %}
-                                    <a href="javascript:;" onclick="verModalGet('ver_trabajo_completado', '{{ l.pk }}', 'fa-solid fa-plane-circle-check', 'modal-lg', '{{ request.path }}')" class="text-success">
+                                    <a href="javascript:;"
+                                       onclick="verModalGet('ver_trabajo_completado', '{{ l.pk }}', 'fa-solid fa-plane-circle-check', 'modal-lg', '{{ request.path }}')"
+                                       class="text-success">
                                         <b>
                                             <i class="fa-solid fa-plane-circle-check"></i> Marked as completed
                                         </b>
@@ -197,54 +175,53 @@
                             <div class="btn-group dropleft">
                                 <button type="button" class="btn btn-white btn-sm width-100 dropdown-toggle"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-angle-left mr-1"></i> Actions
+                                    <i class="fas fa-angle-left mr-1"></i> Acción
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    {% if can_change and l.pagado and not l.trabajo_completado %}
-                                        <a class="dropdown-item"
-                                           href="{{ ruta }}?pk={{ l.pk }}&action=change&{{ dict_url_vars }}">
-                                            <i class="fas fa-edit"></i> Change date / pilot
-                                        </a>
-                                    {% endif %}
                                     {% if can_view %}
                                         <a class="dropdown-item"
                                            href="{{ ruta }}?pk={{ l.pk }}&action=detalle&{{ dict_url_vars }}">
-                                            <i class="fas fa-eye"></i> Detail
+                                            <i class="fas fa-eye"></i> Detalle
                                         </a>
                                         {% if l.estado == 'EN_ESPERA' %}
                                             <a class="dropdown-item" t
                                                href="{{ ruta }}?pk={{ l.pk }}&action=pago_pendiente&{{ dict_url_vars }}">
-                                                <i class="fas fa-check-double"></i> Validate Payment
+                                                <i class="fas fa-check-double"></i> Validar Pago
                                             </a>
                                         {% endif %}
+                                        <a onclick="verModalHistorial('historial_orden', '{{ l.pk|get_encrypt }}', 'fas fa-history')"
+                                           class="dropdown-item"
+                                           href="javascript:;">
+                                            <i class="fas fa-history"></i> Ver Detalle de Orden
+                                        </a>
                                         <a data-toggle="modal" data-target="#modalMetodoPago{{ l.id }}"
                                            class="dropdown-item"
                                            href="javascript:;">
-                                            {{ l.get_icon }} See payment details
+                                            {{ l.get_icon }} Ver Detalle de Pago
                                         </a>
                                         <a onclick="verModalHistorial('historial_pedido', '{{ l.pk|get_encrypt }}', 'fas fa-history')"
                                            class="dropdown-item"
                                            href="javascript:;">
-                                            <i class="fas fa-history"></i> History
+                                            <i class="fas fa-history"></i> Historial
                                         </a>
                                         {% if not l.estado == 'ERROR_METODO_PAGO' %}
                                             {% if can_change and l.estado != 'ANULADO' %}
                                                 <a class="dropdown-item text-danger" title="Anular"
                                                    href="?pk={{ l.pk|get_encrypt }}&action=anular_pedido">
-                                                    <i class="fas fa-times-circle"></i> Annul
+                                                    <i class="fas fa-times-circle"></i> Anular
                                                 </a>
                                             {% endif %}
                                             {% if request.user.is_superuser and l.es_pago_electronico and not l.pago_reversado %}
                                                 <a class="dropdown-item text-warning" title="Reversar pago"
                                                    href="?pk={{ l.pk|get_encrypt }}&pago_id={{ l.id|get_encrypt }}&action=reversar_pago">
-                                                    <i class="fa-solid fa-money-bill-transfer"></i> Reverse payment
+                                                    <i class="fa-solid fa-money-bill-transfer"></i> Reversar Pago
                                                 </a>
                                             {% endif %}
                                         {% endif %}
                                         {% if can_change and l.pagado and not l.trabajo_completado %}
                                             <a class="dropdown-item text-success"
                                                href="{{ ruta }}?pk={{ l.pk }}&action=mark_as_completed&{{ dict_url_vars }}">
-                                                <i class="fa-solid fa-plane-circle-check"></i> Mark as completed
+                                                <i class="fa-solid fa-plane-circle-check"></i> Marcar como Completado
                                             </a>
                                         {% endif %}
                                     {% endif %}
@@ -275,7 +252,7 @@
                     <div class="modal-footer" id="footerModalView">
                         <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
                                 class="fa fa-window-close"></i>
-                            Close</a>
+                            Cerrar</a>
                     </div>
                 </form>
             </div>
@@ -303,7 +280,7 @@
                 <div class="modal-footer">
                     <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
                             class="fa fa-window-close"></i>
-                        Close</a>
+                        Cerrar</a>
                 </div>
             </div>
         </div>
@@ -334,18 +311,18 @@
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-striped">
                                         <tbody>
-{#                                        <tr>#}
-{#                                            <th class="text-left">IP</th>#}
-{#                                            <td class="text-left">{{ l.session_user.ip }}</td>#}
-{#                                        </tr>#}
-{#                                        <tr>#}
-{#                                            <th class="text-left">Dispositivo</th>#}
-{#                                            <td class="text-left">{{ l.session_user.dispositivo }}</td>#}
-{#                                        </tr>#}
-{#                                        <tr>#}
-{#                                            <th class="text-left">Localidad</th>#}
-{#                                            <td class="text-left">{{ l.session_user.areageografica }}</td>#}
-{#                                        </tr>#}
+                                        {#                                        <tr>#}
+                                        {#                                            <th class="text-left">IP</th>#}
+                                        {#                                            <td class="text-left">{{ l.session_user.ip }}</td>#}
+                                        {#                                        </tr>#}
+                                        {#                                        <tr>#}
+                                        {#                                            <th class="text-left">Dispositivo</th>#}
+                                        {#                                            <td class="text-left">{{ l.session_user.dispositivo }}</td>#}
+                                        {#                                        </tr>#}
+                                        {#                                        <tr>#}
+                                        {#                                            <th class="text-left">Localidad</th>#}
+                                        {#                                            <td class="text-left">{{ l.session_user.areageografica }}</td>#}
+                                        {#                                        </tr>#}
                                         {% for r in resp_metodo_pago %}
                                             <tr>
                                                 <th class="text-left">{{ r.nombre }}</th>
@@ -359,7 +336,7 @@
                             <div class="modal-footer">
                                 <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
                                         class="fa fa-window-close"></i>
-                                    Close</a>
+                                    Cerrar</a>
                             </div>
                         </div>
                     </div>
@@ -373,6 +350,8 @@
 {% endblock %}
 
 {% block jscript %}
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{ GMAP_API_KEY }}&libraries=places"></script>
     <script src="/static/js/forms.js?v=11"></script>
     <script>
         function formModal(id, text, action, footer = false) {

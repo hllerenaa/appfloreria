@@ -28,7 +28,7 @@ def orderView(request):
                 data["historial"] = historial = HistorialPedido.objects.filter(status=True, pedido_id=pk).order_by('pk')
                 template = get_template('sitio/perfil/historial_pedido.html')
                 return JsonResponse({"result": True, 'data': template.render(data),
-                                     'titulo': 'Order #{} - {}'.format(pk, pedido.user.get_full_name())})
+                                     'titulo': 'Orden #{} - {}'.format(pk, pedido.user.get_full_name())})
             elif action == "detalle_pedido":
                 pk = int(get_decrypt(request.GET['pk'])[1])
                 data['pedido'] = pedido = Pedido.objects.get(id=pk)

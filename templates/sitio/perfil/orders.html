@@ -17,18 +17,13 @@
                             <!-- Order-->
                             {% for l in listado %}
                                 <div class="accordion-item border-top mb-0">
-                                    <div class="accordion-header"><a
-                                            class="accordion-button d-flex fs-4 fw-normal text-decoration-none py-3 collapsed"
-                                            href="#curso{{ l.id }}" data-bs-toggle="collapse" aria-expanded="false"
-                                            aria-controls="curso{{ l.id }}">
-                                        <div class="d-flex justify-content-between w-100" style="max-width: 440px;">
-                                            <div class="me-3 me-sm-4">
-                                                <div class="fs-sm text-muted">#{{ l.id }}</div>
-                                                {% if l.trabajo_completado %}
-                                                    <span class="badge bg-faded-success text-success fs-xs">
-                                                        <i class="fa-solid fa-plane-circle-check"></i> Completed
-                                                    </span>
-                                                {% else %}
+                                    <div class="accordion-header">
+                                        <a class="accordion-button d-flex fs-4 fw-normal text-decoration-none py-3 collapsed"
+                                           href="#curso{{ l.id }}" data-bs-toggle="collapse" aria-expanded="false"
+                                           aria-controls="curso{{ l.id }}">
+                                            <div class="d-flex justify-content-between w-100">
+                                                <div class="me">
+                                                    <div class="fs-sm text-muted">#{{ l.id }}</div>
                                                     <span {% if l.estado == 'COMPLETADO' %}
                                                         class="badge bg-faded-success text-success fs-xs"
                                                     {% elif l.estado == 'DEVUELTO' %}
@@ -39,25 +34,46 @@
                                                         class="badge bg-faded-danger text-danger fs-xs"
                                                     {% else %}
                                                         class="badge bg-faded-info text-info fs-xs"{% endif %}>
-                                                        {{ l.get_estado_display }}
+                                                       <i class="fa fa-vote-yea"></i> {{ l.get_estado_display }}
                                                     </span>
-                                                {% endif %}
+                                                    <span {% if l.estado_entrega == 'ENTREGADO' %}
+                                                        class="badge bg-faded-success text-success fs-xs"
+                                                    {% elif l.estado_entrega == 'DEVUELTO' %}
+                                                        class="badge bg-faded-warning text-warning fs-xs"
+                                                    {% elif l.estado_entrega == 'ANULADO' %}
+                                                        class="badge bg-faded-danger text-danger fs-xs"
+                                                    {% elif l.estado_entrega == 'ENVIADO' %}
+                                                        class="badge bg-faded-primary text-danger fs-xs"
+                                                    {% else %}
+                                                        class="badge bg-faded-info text-info fs-xs"{% endif %}>
+                                                      <i class="fa fa-motorcycle"></i>  {{ l.get_estado_entrega_display }}
+                                                    </span>
+                                                </div>
+                                                <div class="me">
+                                                    <div class="fs-sm text-muted mb-2">Metodo de Pago</div>
+                                                    <div class="fs-sm fw-medium text-dark">
+                                                        {{ l.get_metodo_pago_display }}
+                                                    </div>
+                                                </div>
+                                                <div class="me">
+                                                    <div class="d-none d-sm-block fs-sm text-muted mb-2">Fecha de Pago
+                                                    </div>
+                                                    <div class="d-sm-none fs-sm text-muted mb-2">Fecha de Pago</div>
+                                                    <div class="fs-sm fw-medium text-dark">{{ l.fecha_registro|date:'M d, Y H:i' }}</div>
+                                                </div>
+                                                <div class="me">
+                                                    <div class="fs-sm text-muted mb-2">Total</div>
+                                                    <div class="fs-sm fw-medium text-dark">
+                                                        {{ SIMBOLO_MONEDA }}{{ l.total|intcomma }}</div>
+                                                </div>
                                             </div>
-                                            <div class="me-3 me-sm-4">
-                                                <div class="d-none d-sm-block fs-sm text-muted mb-2">Payment date</div>
-                                                <div class="d-sm-none fs-sm text-muted mb-2">Payment date</div>
-                                                <div class="fs-sm fw-medium text-dark">{{ l.fecha_registro|date:'M d, Y H:i' }}</div>
+                                            <div class="accordion-button-img d-none d-sm-flex ms-auto">
+                                                <h6></h6>
                                             </div>
-                                            <div class="me-3 me-sm-4">
-                                                <div class="fs-sm text-muted mb-2">Total paid</div>
-                                                <div class="fs-sm fw-medium text-dark">{{ SIMBOLO_MONEDA }}{{ l.total|intcomma }}</div>
-                                            </div>
-                                        </div>
-                                        <div class="accordion-button-img d-none d-sm-flex ms-auto">
-                                            <h6>{{ l.get_detalle.first.item.nombre }}</h6>
-                                        </div>
-                                    </a></div>
-                                    <div class="accordion-collapse collapse" id="curso{{ l.id }}" data-bs-parent="#orders">
+                                        </a>
+                                    </div>
+                                    <div class="accordion-collapse collapse" id="curso{{ l.id }}"
+                                         data-bs-parent="#orders">
                                         <div class="accordion-body">
                                             <div class="table-responsive pt-1">
                                                 <table class="table align-middle w-100" style="min-width: 450px;">
@@ -65,60 +81,56 @@
                                                         <tr>
                                                             <td class="border-0 py-1 px-0">
                                                                 <div class="d-flex align-items-center">
-                                                                    <a class="d-inline-block flex-shrink-0 bg-secondary rounded-1 p-md-2 p-lg-3" href="#">
-                                                                        <img src="/media/{{ d.item.foto1 }}" width="110" alt="Product">
+                                                                    <a class="d-inline-block flex-shrink-0 bg-secondary rounded-1 p-md-2 p-lg-3"
+                                                                       href="#">
+                                                                        <img src="/media/{{ d.item.foto1 }}" width="110"
+                                                                             alt="Product">
                                                                     </a>
                                                                     <div class="ps-3 ps-sm-4">
-                                                                        <h4 class="h6 mb-2"><a href="#">{{ d.item.nombre }}</a></h4>
+                                                                        <h4 class="h6 mb-2"><a
+                                                                                href="#">{{ d.item.nombre }}
+                                                                            (${{ d.precio|intcomma }})</a></h4>
+                                                                        {% if d.detalle %}
+                                                                            <span>Adicionales:</span><br>
+                                                                            {% for item in d.detalle %}
+                                                                                <span>{{ item.items_adicionales.nombre }} (${{ item.total }})</span>
+                                                                                <br>
+                                                                            {% endfor %}
+                                                                        {% endif %}
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
-                                                                <div class="fs-sm text-muted mb-2">Quantity</div>
+                                                                <div class="fs-sm text-muted mb-2">Cantidad</div>
                                                                 <div class="fs-sm fw-medium text-dark">{{ d.cantidad|intcomma }}</div>
                                                             </td>
                                                             <td class="border-0 text-end py-1 pe-0 ps-3 ps-sm-4">
                                                                 <div class="fs-sm text-muted mb-2">Total</div>
-                                                                <div class="fs-sm fw-medium text-dark">{{ SIMBOLO_MONEDA }}{{ d.total|intcomma }}</div>
+                                                                <div class="fs-sm fw-medium text-dark">
+                                                                    {{ SIMBOLO_MONEDA }}{{ d.total|intcomma }}</div>
                                                             </td>
                                                         </tr>
-                                                        {% for item in d.items %}
-                                                            <tr>
-                                                                <td class="border-0 py-1 px-0">
-                                                                    <div class="d-flex align-items-center">
-                                                                        <div class="d-inline-block flex-shrink-0 bg-secondary rounded-1 p-md-2 p-lg-3">
-                                                                            {{ forloop.counter }} Aditional
-                                                                        </div>
-                                                                        <div class="ps-3 ps-sm-4">
-                                                                            <h4 class="h6 mb-2"><a href="#">{{ item.items_adicionales.nombre }}</a></h4>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
-                                                                    <div class="fs-sm fw-medium text-dark">1</div>
-                                                                </td>
-                                                                <td class="border-0 text-end py-1 pe-0 ps-3 ps-sm-4">
-                                                                    <div class="fs-sm fw-medium text-dark">{{ SIMBOLO_MONEDA }}{{ item.total|intcomma }}</div>
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
                                                     {% endfor %}
                                                 </table>
                                             </div>
                                             <div class="bg-secondary rounded-1 p-4 my-2">
                                                 <div class="row">
                                                     <div class="col-md-3 col-lg-4 mb-3 mb-md-0">
-                                                        <div class="fs-sm fw-medium text-dark mb-1">Attention detail:</div>
+                                                        <div class="fs-sm fw-medium text-dark mb-1">Detalle de Entrega:
+                                                        </div>
                                                         <div class="fs-sm">{{ l.festimada }}</div>
-{#                                                        <div class="fs-sm text-danger"><i class="fa fa-history"></i>&nbsp;To confirm</div>#}
-                                                        <div class="fs-sm text-muted">Date subject to availability.</div>
+                                                        {#                                                        <div class="fs-sm text-danger"><i class="fa fa-history"></i>&nbsp;To confirm</div>#}
+                                                        <div class="fs-sm text-muted">Fecha sujeta a cambios.
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-3 col-lg-4 mb-3 mb-md-0">
-                                                        <div class="fs-sm fw-medium text-dark mb-1">Location address:</div>
-                                                        <div class="fs-sm">{{ l.direccion }}, ({{ l.millas_totales }})</div>
+                                                        <div class="fs-sm fw-medium text-dark mb-1">Ubicación de Entrega:
+                                                        </div>
+                                                        <div class="fs-sm">{{ l.direccion }}, ({{ l.km_adicionales }})
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-3 mb-4 mb-md-0">
-                                                        <div class="fs-sm fw-medium text-dark mb-1">Coordinates:</div>
+                                                        <div class="fs-sm fw-medium text-dark mb-1">Coordenadas:</div>
                                                         <div class="fs-sm"><b>Lat.</b> {{ l.latitud }}</div>
                                                         <div class="fs-sm"><b>Long.</b> {{ l.longitud }}</div>
                                                     </div>
@@ -127,19 +139,22 @@
                                             <div class="bg-secondary rounded-1 p-4 my-2">
                                                 <div class="row">
                                                     <div class="col-sm-5 col-md-3 col-lg-4 mb-3 mb-md-0">
-                                                        <div class="fs-sm fw-medium text-dark mb-1">Payment method:</div>
+                                                        <div class="fs-sm fw-medium text-dark mb-1">Metodo de Pago:
+                                                        </div>
                                                         <div class="fs-sm">{{ l.get_metodo_pago_display }}</div>
                                                     </div>
                                                     <div class="col-sm-7 col-md-5 mb-4 mb-md-0">
                                                         <a class="btn btn-sm btn-primary w-100 w-md-auto"
-                                                           href="javascript:void(0)" onclick="verModalHistorial('detalle_pedido', '{{ l.pk|get_encrypt }}', 'fas fa-ticket')">
-                                                            <i class="fa fa-ticket me-2 ms-n1"></i> Detail Order
+                                                           href="javascript:void(0)"
+                                                           onclick="verModalHistorial('detalle_pedido', '{{ l.pk|get_encrypt }}', 'fas fa-ticket')">
+                                                            <i class="fa fa-ticket me-2 ms-n1"></i> Detalle de Orden
                                                         </a>
                                                     </div>
                                                     <div class="col-md-4 col-lg-3 text-md-end">
                                                         <a class="btn btn-sm btn-primary w-100 w-md-auto"
-                                                           href="javascript:void(0)" onclick="verModalHistorial('historial_pedido', '{{ l.pk|get_encrypt }}', 'fas fa-history')">
-                                                            <i class="ai-time me-2 ms-n1"></i> Order history
+                                                           href="javascript:void(0)"
+                                                           onclick="verModalHistorial('historial_pedido', '{{ l.pk|get_encrypt }}', 'fas fa-history')">
+                                                            <i class="ai-time me-2 ms-n1"></i> Historial de Orden
                                                         </a>
                                                     </div>
                                                 </div>
@@ -175,7 +190,7 @@
                 <div class="modal-footer">
                     <a href="javascript:;" class="btn btn-danger" data-bs-dismiss="modal"><i
                             class="fa fa-close"></i>&nbsp;
-                        Close</a>
+                        Cerrar</a>
                 </div>
             </div>
         </div>

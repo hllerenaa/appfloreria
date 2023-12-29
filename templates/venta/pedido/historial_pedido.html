@@ -5,16 +5,16 @@
         <thead>
         <tr>
             <th>
-                Date
+                Fecha
             </th>
             <th>
-                Observation
+                Observación
             </th>
             <th>
-                State
+                Estado
             </th>
             <th>
-                File
+                Archivo
             </th>
         </tr>
         </thead>
@@ -34,10 +34,10 @@
                     {% if h.archivo %}
                         <a target="_blank" class="custom-btn-link p-0"
                            href="/media/{{ h.archivo }}">
-                            {{ h.archivo_icon }} Click to download the submitted file
+                            {{ h.archivo_icon }} Click para descargar el archivo
                         </a>
                     {% else %}
-                        NONE
+                        Ninguno
                     {% endif %}
                 </td>
             </tr>

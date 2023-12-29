@@ -21,6 +21,13 @@ ESTADO_PEDIDO = (
     ("ERROR_METODO_PAGO", "Error en el médoto de pago")
 )
 
+ESTADO_ENTREGA_ = (
+    ("PENDIENTE", "Pendiente de envio"),
+    ("ENVIADO", "En camino al cliente"),
+    ("ENTREGADO", "Entregado a cliente"),
+    ("DEVUELTO", "Devuelto al local",),
+)
+
 METODO_PAGOS = (
     ("PAYPHONE", "Payphone"),
     ("PAYPAL", "Paypal"),
@@ -86,6 +93,22 @@ class Pedido(ModeloBase):
     razon_reverso = models.TextField(default='', blank=True, null=True)
     pago_reversado_por = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name="Pago reversado por", null=True, blank=True, related_name="venta_pedido_pago_reversado_por")
     modo_pago = models.BooleanField("Ejecución de Paypal", choices=TIPO_ENTORNO, default=1)
+    # DATOS DE ENVIO
+    estado_entrega = models.CharField("Acción de Envio", default='PENDIENTE', choices=ESTADO_ENTREGA_, max_length=100)
+
+    @property
+    def direccion(self):
+        return f"{self.address1 or ''} {self.address2 or ''} - {self.city or ''}, {self.state or ''} - {self.reference or ''}"
+
+    def latitud_str(self):
+        return str(self.latitud)
+
+    def longitud_str(self):
+        return str(self.longitud)
+
+    def tiempo_de_viaje_str(self):
+        from core.funciones import formatear_minutos_str
+        return formatear_minutos_str(self.tiempo_de_viaje_en_minutos, horas_por_dia=24)
 
     def get_telefono(self):
         return self.user.telefono_formateado()
@@ -170,7 +193,7 @@ class PedidoDetalle(ModeloBase):
     total = models.DecimalField(verbose_name="Total", default=0, max_digits=30, decimal_places=2,)
 
     def detalle(self):
-        return self.pedidoadicionalesdetalle_set.filter(status=True).order_by('items_adicionales__item__orden')
+        return self.pedidoadicionalesdetalle_set.filter(status=True).order_by('id')
 
     def __str__(self):
         return f"{self.item} ({self.precio} x {self.cantidad}) Total: {self.total}"

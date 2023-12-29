@@ -53,13 +53,13 @@
                 {% endif %}
                 {% if pedido.impuestos_ubicacion %}
                     <li class="d-flex justify-content-between mb-2">
-                        (+) Overtravel: <span
+                        (+) Precio de Envio: <span
                             class="fw-semibold ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos_ubicacion|intcomma }}</span>
                     </li>
                 {% endif %}
                 {% if pedido.impuestos %}
                     <li class="d-flex justify-content-between mb-2">
-                        (+) Online Payment: <span
+                        (+) Pago Online: <span
                             class="fw-semibold ms-2 impuesto_">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos|intcomma }}</span>
                     </li>
                 {% endif %}

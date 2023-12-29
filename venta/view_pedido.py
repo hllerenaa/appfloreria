@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.utils import timezone
 
+from appfloreria.settings import GMAP_API_KEY
 from core.correos_background import enviar_correo_html
 from core.custom_models import FormError
 from core.decoradores import custom_atomic_request
@@ -66,7 +67,7 @@ def pedidoView(request):
                             correos_a_enviar.append(
                                 get_datos_email_html({
                                     'titulo': f'Validación de Pago',
-                                    'url_compras': "/cursos-inscrito/id={}".format(get_encrypt(pedido.id)[1]), 'pedido': pedido,
+                                    'url_compras': "/orders?id={}".format(get_encrypt(pedido.id)[1]), 'pedido': pedido,
                                     "mensaje_correo": 'Tu transacción está con estado "{}".'.format(pedido.get_estado_display()),
                                     "subject": subject,
                                 }, pedido.user, subject,
@@ -74,9 +75,6 @@ def pedidoView(request):
                             )
                             if pedido.estado == "COMPLETADO":
                                 pedido.save()
-                                det_ped = pedido.get_detalle()
-                                for det in det_ped:
-                                    det.inscribir(request)
                             salva_auditoria(request, filtro, action,
                                             customgetattr(filtro, nombre_para_audit),
                                             qs_anterior=qs_anterior,
@@ -191,6 +189,18 @@ def pedidoView(request):
                 data["historial"] = historial = HistorialPedido.objects.filter(status=True, pedido_id=pk).order_by('pk')
                 template = get_template('venta/pedido/historial_pedido.html')
                 return JsonResponse({"result": True, 'data': template.render(data), 'titulo': 'PAGO #{} - {}'.format(pk, pedido.user.get_full_name())})
+            elif action == "historial_orden":
+                pk = int(get_decrypt(request.GET['pk'])[1])
+                data['pedido'] = pedido = Pedido.objects.get(id=pk)
+                data["historial"] = historial = HistorialPedido.objects.filter(status=True, pedido_id=pk).order_by('pk')
+                data['start_lat'] = start_lat = str(data['confi'].latitud)
+                data['start_lon'] = start_lon = str(data['confi'].longitud)
+                data['dest_lat'] = dest_lat = str(pedido.latitud)
+                data['dest_lon'] = dest_lon = str(pedido.longitud)
+                limite_envio = data['confi'].limite_km_envio
+                data['limite_envio'] = str(limite_envio)
+                template = get_template('venta/pedido/historial_orden.html')
+                return JsonResponse({"result": True, 'data': template.render(data), 'titulo': 'PAGO #{} - {}'.format(pk, pedido.user.get_full_name())})
             elif action == 'detalle':
                 if can_add:
                     data["compra"] = Pedido.objects.get(id=request.GET['pk'], status=True)
@@ -249,6 +259,7 @@ def pedidoView(request):
             data['METODO_PAGOS'] = METODO_PAGOS
             data['ESTADO_PEDIDO'] = ESTADO_PEDIDO[1:]
             data["list_count"] = len(listado)
+            data["GMAP_API_KEY"] = GMAP_API_KEY
             data['totalreversado'] = totalreversado = listado.filter(pago_reversado=True).aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
             data['totalvalido'] = totalvalido = listado.filter(pago_reversado=False).aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
             data['totalrecaudado'] = totalrecaudado = listado.aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')

@@ -1,0 +1,144 @@
+{% load templatefunctions %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Información del Cliente</h5>
+        <p class="card-text">Nombre: {{ pedido.user.get_full_name }}</p>
+        <p class="card-text">Dirección de
+            Envío: {{ pedido.address1 }} {{ pedido.address2 }} {{ pedido.city }}, {{ pedido.state }} {{ pedido.zipcode }}</p>
+        <p class="card-text">Referencia: {{ pedido.reference }}</p>
+
+        <h5 class="card-title mt-3">Detalles del Pedido</h5>
+        <p class="card-text">Fecha Estimada de Entrega: {{ pedido.festimada }}</p>
+        <p class="card-text">Método de Pago: {{ pedido.get_metodo_pago_display }}</p>
+        <p class="card-text">Observaciones: {{ pedido.observacion }}</p>
+
+        <!-- Detalles del Pedido -->
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for detalle in pedido.pedidodetalle_set.all %}
+                <tr>
+                    <td>{{ detalle.item.nombre }}</td>
+                    <td>${{ detalle.precio }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>${{ detalle.total }}</td>
+                </tr>
+                <!-- Ítems Adicionales para cada Detalle -->
+                {% for adicional in detalle.detalle %}
+                    <tr class="table-secondary">
+                        <td>→ {{ adicional.items_adicionales.nombre }}</td>
+                        <td>${{ adicional.total }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h5 class="card-title mt-3">Resumen Financiero</h5>
+        <p class="card-text">Subtotal: ${{ pedido.subtotal }}</p>
+        <p class="card-text">Impuestos: ${{ pedido.impuestos }}</p>
+        <p class="card-text">Impuestos por Ubicación: ${{ pedido.impuestos_ubicacion }}</p>
+        <p class="card-text">Total Kilómetros: {{ pedido.km_totales }}</p>
+        <p class="card-text">Kilómetros Adicionales: {{ pedido.km_adicionales }}</p>
+        <p class="card-text">Tiempo Estimado de Viaje: {{ pedido.tiempo_de_viaje_en_minutos }} minutos</p>
+        <p class="card-text"><strong>Total: ${{ pedido.total }}</strong></p>
+
+        <div id="map" style="width: 100%; height: 250px;"></div>
+    </div>
+</div>
+
+<script>
+
+    var posA = {lat: parseFloat({{ start_lat }}), lng: parseFloat({{ start_lon }})};
+    var posB = {lat: parseFloat({{ dest_lat }}), lng: parseFloat({{ dest_lon }})};
+    console.log(posA)
+    console.log(posB)
+
+    function getTimeToDrive() {
+        var geocoder = new google.maps.Geocoder();
+        var service = new google.maps.DistanceMatrixService();
+        var request = {
+            origins: [posA],
+            destinations: [posB],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+            avoidHighways: false,
+            avoidTolls: false,
+        };
+        service.getDistanceMatrix(request).then((response) => {
+            $('input[name=driving_time]').val(
+                parseInt(
+                    (
+                        (
+                            response.rows && response.rows[0] &&
+                            response.rows[0].elements && response.rows[0].elements[0] &&
+                            response.rows[0].elements[0].duration && response.rows[0].elements[0].duration.value
+                        ) || 0
+                    ) / 60
+                )
+            );
+            console.log($('input[name=driving_time]').val());
+        });
+    }
+
+    function initMap() {
+        getTimeToDrive();
+        var map = new google.maps.Map(document.getElementById("map"), {
+            center: posA,
+            zoom: 10,
+        });
+
+        // Agrega marcadores en las posiciones A y B
+        new google.maps.Marker({position: posA, map: map});
+        new google.maps.Marker({position: posB, map: map});
+
+        // Dibuja la ruta entre las posiciones A y B
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        var request = {
+            origin: posA,
+            destination: posB,
+            travelMode: google.maps.TravelMode.DRIVING,
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === "OK") {
+                directionsRenderer.setDirections(result);
+            } else if (status === "ZERO_RESULTS") {
+                console.log("No routes were found between the selected locations.");
+            } else {
+                console.log("Error calculating route: " + status);
+            }
+        });
+        var kilometros = {{ limite_envio }};
+        var metrosPorKilometro = 1000;
+        // Dibuja un círculo de 'kilometros' alrededor de la posición A
+        var circle = new google.maps.Circle({
+            center: posA,
+            radius: kilometros * metrosPorKilometro, // Convertir kilometros a metros
+            map: map,
+            fillColor: "#rgba(0, 0, 255, 0.1)",
+            strokeColor: "#0000ff",
+            strokeOpacity: 0.2,
+            strokeWeight: 2,
+        });
+
+
+    }
+</script>
+<script>
+    $(function () {
+        initMap()
+    })
+</script>
