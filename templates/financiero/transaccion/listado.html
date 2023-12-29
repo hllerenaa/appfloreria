@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load templatefunctions %}
+{% block content %}
+    <form method="GET">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col-md-6 col-sm-12 offset-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Buscar" aria-label="Buscar"
+                               aria-describedby="button-addon2" name="criterio" value="{{ criterio }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" id="button-addon2"><i
+                                    class="fa fa-search"></i></button>
+                            {% if url_vars %}
+                                <a title="Ver todo" href="{{ ruta }}" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="panel panel-inverse">
+
+
+
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table id="tabla" class="table table-striped table-td-valign-middle table-bordered">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            Fecha
+                        </th>
+                        <th>
+                            Usuario
+                        </th>
+                        <th>
+                            Comprobante
+                        </th>
+                        <th>
+                            Valor
+                        </th>
+                        <th>
+                            Método de pago
+                        </th>
+                        <th>
+                            Estado
+                        </th>
+                        <th class="text-center">
+                            Acción
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for l in listado %}
+                        <tr>
+                            <td>
+                                {{ l.fecha_registro }}
+                            </td>
+                            <td>
+                                {{ l.get_cliente }}
+                            </td>
+                            <td>
+                                {{ l.get_razon_tr_display }} #{{ l.comprobante_tr }}
+                            </td>
+                            <td>
+                                {{ SIMBOLO_MONEDA }}{{ l.valor|intcomma }}
+                            </td>
+                            <td>
+                                {{ l.get_metodo_pago_display }}
+                            </td>
+                            <td>
+                                {{ l.estado_html }}
+                            </td>
+                            <td class="text-center">
+                                {% if can_change %}
+                                    <a class="btn btn-mini btn-info" title="Pago pendiente"
+                                       href="?pk={{ l.pk }}&action=pago_pendiente">
+                                        <i class="fas fa-list-alt"></i>
+                                    </a>
+                                {% endif %}
+                                {% if can_view %}
+                                    <a onclick="abrirHistorial('{{ l.pk|get_encrypt }}')" class="btn btn-mini btn-secondary" title="Historial"
+                                       href="javascript:;">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- paginacion  -->
+                {% include 'paginacion.html' %}
+                <!-- final de la paginacion  -->
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="/static/lightbox/css/lightbox.min.css">
+    <script src="/static/lightbox/js/lightbox-plus-jquery.min.js"></script>
+    <div id="modalHisTran" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-history"></i> Historial</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jscript %}
+    <script>
+        const modalHisTran = $('#modalHisTran');
+
+        function abrirHistorial(pk) {
+            pantallaespera();
+            getPromise(`{{ ruta }}`, {pk: pk, action: 'historial_transaccion'}).then(function (data) {
+                if (data.status) {
+                    modalHisTran.find('.modal-body').children('.container').html(data.content_historial);
+                    modalHisTran.modal('show');
+                }
+                $.unblockUI();
+            }).finally(() => $.unblockUI());
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'sitio/base.html' %}
+{% load l10n %}
+{% load humanize %}
+{% load templatefunctions %}
+{% block head %}
+    <style>
+        .border {
+            border-radius: 17px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="breadcrumbs-area position-relative">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="breadcrumb-content position-relative section-content">
+                        <h3 class="title-3">Metodo de Pago</h3>
+                        <ul>
+                            <li><a href="/">Inicio</a></li>
+                            <li><a href="/carrito/">Carrito</a></li>
+                            <li><a href="/checkout/">Confirmación de Pedido</a></li>
+                            <li>Metodo de Pago</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="form-send-money" class="needs-validation container position-relative zindex-2 pt-5 pb-lg-5 pb-md-4 pb-2" style="margin-top: 27px;"
+          method="POST"
+          action="{{ request.path }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="pagar"/>
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <h2 class="pb-2 pt-md-2 my-4 mt-lg-5">Confirmación de pago <span
+                        class='fs-base fw-normal text-muted'>({{ detallePedido.count }}
+                    {% if detallePedido.count > 1 or detallePedido.count == 0 %}items{% else %}item{% endif %})</span>
+                </h2>
+                <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3 border-bottom">
+                    Subtotal:<span class="fs-3 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.subtotal|intcomma }}</span>
+                </div>
+                {% if pedido.impuestos_ubicacion %}
+                    <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3">
+                        (+) Precio de Envio:<span
+                            class="fs-5 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos_ubicacion|intcomma }}</span>
+                    </div>
+                {% endif %}
+                <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3">
+                    Total:<span
+                        class="fs-3 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.total|intcomma }}</span>
+                </div>
+
+                <div class="form-group mb-1">
+                    <label class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3"
+                           for="id_archivo_pago">Cuenta para depositar:</label>
+                    <div class="form-group">
+                        <div class="container-fluid px-0">
+                            <div class="row">
+                                {% for c in cuentas %}
+                                    <div class="col-lg-6 item-cuentas">
+                                        <div class="d-flex align-items-center">
+                                            <input style="margin-right: 5px;" required
+                                                   id="entidad_fin_id_{{ forloop.counter }}"
+                                                   name="entidad_fin" type="radio"
+                                                   value="{{ c.id }}">
+                                            <label style="cursor: pointer;"
+                                                   class="form-label ml-2 mt-2"
+                                                   for="entidad_fin_id_{{ forloop.counter }}">
+                                                <div class="row no-gutters d-flex align-items-center">
+                                                    <div class="col-auto text-right">
+                                                        <img style="width: 80px;height: 80px;object-fit: contain;"
+                                                             src="{{ c.ent_fin.get_logo }}"
+                                                             class="img-fluid rounded" alt="">
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="card-block px-2">
+                                                            <div class="card-title"
+                                                                 style="font-size: 12px;">{{ c.ent_fin.nombre }}</div>
+                                                            <div class="card-text"
+                                                                 style="font-size: 12px;">
+                                                                <b>{{ c.num_cuenta }}</b>
+                                                                ({{ c.get_tipo_display }})
+                                                                <div>
+                                                                    {{ c.get_tipo_documento_display }} {{ c.documento }}
+                                                                </div>
+                                                                <div>
+                                                                    {{ c.nombres }}
+                                                                </div>
+                                                                <div style=" text-transform: lowercase;">
+                                                                    {{ c.email|default:''|lower }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group py-3">
+                    <label class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3"
+                           for="id_archivo_pago">Evidencia:</label>
+                    <div class="media align-items-center">
+                        <input class="form-control" required type="file" name="archivo_pago"
+                               id="id_archivo_pago" data-max-file-size="3M"
+                               data-allowed-file-extensions="jpg jpeg png tiff jfif pdf">
+                        <div class="textoMessageInputError text-danger"
+                             id="errorMessagearchivo_pago"></div>
+                    </div>
+                </div>
+
+                <center>
+                    <button class="btn btn-lg btn-primary w-100 w-sm-auto" id="submit" type="submit">
+                        Enviar Comprobante de Pago
+                    </button>
+                </center>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+{% block jscript %}
+    <script src="/static/js/forms.js?v=11"></script>
+    <script>
+        $('input[name=entidad_fin]').change(function () {
+            $('.item-cuentas').removeClass('border');
+            $('input[name=entidad_fin]:checked').parent().parent().addClass('border');
+        });
+    </script>
+{% endblock %}

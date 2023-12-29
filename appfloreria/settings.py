@@ -75,6 +75,8 @@ with open(os.path.join(BASE_DIR, 'credenciales.json')) as json_file:
     PAYPAL_ORDER_URL_TEST = data["PAYPAL_TEST"]['ORDER_URL']
     PAYPAL_ORDER_DETAIL_URL_TEST = data["PAYPAL_TEST"]['ORDER_DETAIL_URL']
     PAYPAL_REEMBOLSO_URL_TEST = data["PAYPAL_TEST"]['REEMBOLSO_URL']
+    # GMAPS
+    GMAP_API_KEY = data['GMAP_API_KEY']
 
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
@@ -101,6 +103,8 @@ INSTALLED_APPS = [
     'form_utils',
     'webpush',
     'pwa',
+    'venta',
+    'financiero',
 ]
 
 MIDDLEWARE = [

@@ -15,6 +15,7 @@ from autenticacion.urls import autenticacion_urls
 from autenticacion.view_perfil import perfilView
 from core.ajax import ConsultasAjax
 from appfloreria.view_clearsitedata import clearSiteDataView
+from financiero.urls import financiero_urls
 from mantenimiento.urls import mantenimiento_urls
 from appfloreria import settings
 from appfloreria.view_redirect import redirectView, redirectToUrlView
@@ -57,6 +58,14 @@ urls_sistema = (
         "url": 'mantenimiento/',
         "sub_urls": mantenimiento_urls,
         "include": include('mantenimiento.urls'),
+        "name": None,
+        "vista": None
+    },
+    {
+        "nombre": "Finanzas",
+        "url": 'financiero/',
+        "sub_urls": financiero_urls,
+        "include": include('financiero.urls'),
         "name": None,
         "vista": None
     },

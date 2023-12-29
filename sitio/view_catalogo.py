@@ -33,20 +33,26 @@ def catalogoView(request):
                     if producto_existente:
                         # Si el producto con los mismos items adicionales ya existe, aumentar la cantidad
                         producto_existente['cantidad'] += 1
+                        precio_total_adicionales = sum(Decimal(item['precio']) for item in producto_existente['adicionales'])
+                        subtotal = (Decimal(producto.precio) + precio_total_adicionales) * producto_existente['cantidad']
+                        producto_existente['subtotal'] = subtotal
+
                     else:
                         # Si el producto no existe, agregarlo al carrito
                         adicionales = [
                             {
                                 'id': item_id,
                                 'nombre': ProductoItems.objects.get(id=item_id).nombre,
+                                'foto': ProductoItems.objects.get(id=item_id).foto1,
                                 'precio': str(ProductoItems.objects.get(id=item_id).precio)
                             } for item_id in item_ids
                         ]
                         precio_total_adicionales = sum(Decimal(item['precio']) for item in adicionales)
-                        subtotal = Decimal(producto.precio) + precio_total_adicionales
+                        subtotal = (Decimal(producto.precio) + precio_total_adicionales) * 1
                         producto_principal = {
                             'identificador_unico': identificador_unico,
                             'id': producto.id,
+                            'foto': producto.foto1,
                             'nombre': producto.nombre,
                             'precio': str(producto.precio),
                             'cantidad': 1,
@@ -63,9 +69,7 @@ def catalogoView(request):
 
                     return JsonResponse({'mensaje': 'Producto agregado al carrito', 'resp': True})
                 except Exception as ex:
-                    return JsonResponse({'mensaje': 'Intentelo más tarde', 'resp': False})
-
-
+                    return JsonResponse({'mensaje': f'Intentelo más tarde, {ex}', 'resp': False})
 
     elif request.method == 'GET':
         if 'action' in request.GET:

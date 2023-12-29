@@ -82,9 +82,8 @@
                         {% endif %}
                         <span class="desc-content mb-5">{{ producto.descripcion|safe }}</span>
                     </div>
-
-                    {% if request.user.is_authenticated %}
-                        <div class="product-options mt-3">
+                    <div class="product-options mt-3">
+                        {% if producto.listitems %}
                             <h4>Opciones Adicionales</h4>
                             <div class="row">
                                 {% for item in producto.listitems %}
@@ -115,122 +114,83 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                            <div class="mt-3 add-to_btn">
-                                <a class="btn product-cart button-icon flosun-button dark-btn"
-                                   id="finalize-order-btn">Agregar al Carrito
-                                </a>
-                            </div>
+                        {% endif %}
+                        <div class="mt-3 add-to_btn">
+                            <a class="btn product-cart button-icon flosun-button dark-btn"
+                               id="finalize-order-btn">Agregar al Carrito
+                            </a>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
-
-
-                <script>
-                    document.getElementById('finalize-order-btn').addEventListener('click', function () {
-                        let additionalItemsSelected = document.querySelectorAll('.additional-item-checkbox:checked').length;
-                        let productoItemsExist = '{{ producto.listitems|length }}' > 0;
-                        if (productoItemsExist && additionalItemsSelected === 0) {
-                            Swal.fire({
-                                title: '¿Estás seguro?',
-                                text: "No has seleccionado ninguna opción adicional para tu pedido.",
-                                type: 'warning',
-                                showCancelButton: true,
-                                allowOutsideClick: false,
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33',
-                                confirmButtonText: 'Sí, agregar al carrito',
-                                cancelButtonText: 'Volver y seleccionar'
-                            }).then((result) => {
-                                if (result.value) {
-                                    addToCart();
-                                }
-                            })
-                        } else {
-                            addToCart();
-                        }
-                    });
-
-
-                    function addToCart() {
-                        const productoId = '{{ producto.id }}'; // ID del producto principal desde la plantilla de Django
-                        const adicionalesSeleccionados = [];
-
-                        // Recopilar todos los IDs de los ítems adicionales seleccionados
-                        $('.additional-item-checkbox:checked').each(function () {
-                            adicionalesSeleccionados.push($(this).val());
-                        });
-
-                        // Preparar los datos para enviar
-                        const data = {
-                            'action': 'addcarrito',
-                            'producto_id': productoId,
-                            'additional_items': adicionalesSeleccionados
-                        };
-                        console.log(adicionalesSeleccionados)
-                        pantallaespera();
-                        // Realizar la solicitud AJAX
-                        $.ajax({
-                            url: '{{ request.path }}', // Asegúrate de sustituir con la URL correcta
-                            type: 'POST',
-                            data: data,
-                            success: function (response) {
-                                $.unblockUI();
-                                if (response.resp) {
-                                    alertaSuccess(response.mensaje); // Producto agregado exitosamente
-                                } else {
-                                    alertaDanger(response.mensaje); // Hubo un error al agregar el producto
-                                }
-                            },
-                            error: function (error) {
-                                $.unblockUI();
-                                console.error('Error:', error);
-                            }
-                        });
-
-                    }
-                </script>
-
-
-                {#                <div class="col-lg-7 col-custom">#}
-                {#                    <div class="product-summery position-relative">#}
-                {#                        <div class="product-head mb-1">#}
-                {#                            <h2 class="product-title">{{ producto.nombre }}</h2>#}
-                {#                        </div>#}
-                {#                        {% if request.user.is_authenticated %}#}
-                {#                            <div class="price-box mb-1">#}
-                {#                                <span class="regular-price">${{ producto.precio }}</span>#}
-                {#                            </div>#}
-                {#                        {% endif %}#}
-                {#                        <span class="desc-content mb-5"> {{ producto.descripcion|safe }}#}
-                {#                        </span>#}
-                {##}
-                {##}
-                {#                        {% if request.user.is_authenticated %}#}
-                {#                        <div class="quantity-with_btn mb-5">#}
-                {#                            <div class="quantity">#}
-                {#                                <div class="cart-plus-minus">#}
-                {#                                    <input class="cart-plus-minus-box" value="0" type="text">#}
-                {#                                    <div class="dec qtybutton">-</div>#}
-                {#                                    <div class="inc qtybutton">+</div>#}
-                {#                                </div>#}
-                {#                            </div>#}
-                {#                            <div class="add-to_cart">#}
-                {#                                <a class="btn product-cart button-icon flosun-button dark-btn" href="cart.html">Agregar#}
-                {#                                    al carrito</a>#}
-                {#                            </div>#}
-                {#                        </div>#}
-                {#                        {% endif %}#}
-                {#                        <div class="social-share mb-4">#}
-                {#                            <span>Share :</span>#}
-                {#                            <a href="#"><i class="fa fa-facebook-square facebook-color"></i></a>#}
-                {#                            <a href="#"><i class="fa fa-twitter-square twitter-color"></i></a>#}
-                {#                            <a href="#"><i class="fa fa-linkedin-square linkedin-color"></i></a>#}
-                {#                            <a href="#"><i class="fa fa-pinterest-square pinterest-color"></i></a>#}
-                {#                        </div>#}
-                {#                    </div>#}
-                {#                </div>#}
             </div>
         </div>
-    </div><br><br>
+    </div>
+{% endblock %}
+{% block jscript %}
+    <script>
+        document.getElementById('finalize-order-btn').addEventListener('click', function () {
+            let additionalItemsSelected = document.querySelectorAll('.additional-item-checkbox:checked').length;
+            let productoItemsExist = '{{ producto.listitems|length }}' > 0;
+            if (productoItemsExist && additionalItemsSelected === 0) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No has seleccionado ninguna opción adicional para tu pedido.",
+                    type: 'warning',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, agregar al carrito',
+                    cancelButtonText: 'Volver y seleccionar'
+                }).then((result) => {
+                    if (result.value) {
+                        addToCart();
+                    }
+                })
+            } else {
+                addToCart();
+            }
+        });
 
+
+        function addToCart() {
+            const productoId = '{{ producto.id }}'; // ID del producto principal desde la plantilla de Django
+            const adicionalesSeleccionados = [];
+
+            // Recopilar todos los IDs de los ítems adicionales seleccionados
+            $('.additional-item-checkbox:checked').each(function () {
+                adicionalesSeleccionados.push($(this).val());
+            });
+
+            // Preparar los datos para enviar
+            const data = {
+                'action': 'addcarrito',
+                'producto_id': productoId,
+                'additional_items': adicionalesSeleccionados
+            };
+            pantallaespera();
+            // Realizar la solicitud AJAX
+            $.ajax({
+                url: '{{ request.path }}', // Asegúrate de sustituir con la URL correcta
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    $.unblockUI();
+                    if (response.resp) {
+                        alertaSuccess(response.mensaje); // Producto agregado exitosamente
+                        setTimeout(function () { // Establecer un temporizador para recargar la página
+                            location.reload();
+                        }, 1000); // 1000 milisegundos = 1 segundos
+                    } else {
+                        alertaDanger(response.mensaje); // Hubo un error al agregar el producto
+                    }
+                },
+                error: function (error) {
+                    $.unblockUI();
+                    console.error('Error:', error);
+                }
+            });
+
+        }
+    </script>
 {% endblock %}

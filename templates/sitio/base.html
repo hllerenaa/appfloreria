@@ -172,66 +172,36 @@
                     <div class="header-right-area main-nav">
                         <ul class="nav">
                             <li class="minicart-wrap">
-                                <a href="#" class="minicart-btn toolbar-btn">
+                                <a href="#" class="minicart-btn toolbar-btn tr" title="Ver Carrito de Compras">
                                     <i class="fa fa-shopping-cart"></i>
-                                    <span class="cart-item_count">3</span>
+                                    <span class="cart-item_count">{{ request.session.carrito|length }}</span>
                                 </a>
                                 <div class="cart-item-wrapper dropdown-sidemenu dropdown-hover-2">
-                                    <div class="single-cart-item">
-                                        <div class="cart-img">
-                                            <a href="cart.html"><img src="/static/sitio/assets/images/cart/1.jpg"
-                                                                     alt=""></a>
-                                        </div>
-                                        <div class="cart-text">
-                                            <h5 class="title"><a href="cart.html">Odio tortor consequat</a></h5>
-                                            <div class="cart-text-btn">
-                                                <div class="cart-qty">
-                                                    <span>1×</span>
-                                                    <span class="cart-price">$98.00</span>
+                                    {% for producto in request.session.carrito %}
+                                        <div class="single-cart-item">
+                                            <div class="cart-img">
+                                                <a href="/carrito"><img src="/static/sitio/assets/images/cart/1.jpg"
+                                                                         alt=""></a>
+                                            </div>
+                                            <div class="cart-text">
+                                                <h5 class="title"><a href="/carrito">{{ producto.nombre }}</a></h5>
+                                                <div class="cart-text-btn">
+                                                    <div class="cart-qty">
+                                                        <span>{{ producto.cantidad }}×</span>
+                                                        <span class="cart-price">${{ producto.subtotal }}</span>
+                                                    </div>
+                                                    <span>Adicionales {{ producto.adicionales|length }}</span>
                                                 </div>
-                                                <button type="button"><i class="ion-trash-b"></i></button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="single-cart-item">
-                                        <div class="cart-img">
-                                            <a href="cart.html"><img src="/static/sitio/assets/images/cart/2.jpg"
-                                                                     alt=""></a>
-                                        </div>
-                                        <div class="cart-text">
-                                            <h5 class="title"><a href="cart.html">Integer eget augue</a></h5>
-                                            <div class="cart-text-btn">
-                                                <div class="cart-qty">
-                                                    <span>1×</span>
-                                                    <span class="cart-price">$98.00</span>
-                                                </div>
-                                                <button type="button"><i class="ion-trash-b"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="single-cart-item">
-                                        <div class="cart-img">
-                                            <a href="cart.html"><img src="/static/sitio/assets/images/cart/3.jpg"
-                                                                     alt=""></a>
-                                        </div>
-                                        <div class="cart-text">
-                                            <h5 class="title"><a href="cart.html">Eleifend quam</a></h5>
-                                            <div class="cart-text-btn">
-                                                <div class="cart-qty">
-                                                    <span>1×</span>
-                                                    <span class="cart-price">$98.00</span>
-                                                </div>
-                                                <button type="button"><i class="ion-trash-b"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {% endfor %}
                                     <div class="cart-price-total d-flex justify-content-between">
                                         <h5>Total :</h5>
-                                        <h5>$166.00</h5>
+                                        <h5>${{ request.session.total }}</h5>
                                     </div>
                                     <div class="cart-links d-flex justify-content-between">
-                                        <a class="btn product-cart button-icon flosun-button dark-btn" href="/carrito">Ver Carrito</a>
-                                        <a class="btn flosun-button secondary-btn rounded-0" href="/checkout">Confirmar</a>
+                                        <a style="width: 100%" class="btn product-cart button-icon flosun-button dark-btn btn-block" href="/carrito">Ver
+                                            Carrito</a>
                                     </div>
                                 </div>
                             </li>
@@ -464,6 +434,10 @@
 {% block content %}
 {% endblock %}
 
+<br><br>
+<br><br>
+<br><br>
+<br><br>
 <footer class="footer-area">
     <div class="footer-widget-area">
         <div class="container container-default custom-area">
@@ -495,17 +469,17 @@
                         <h2 class="widget-title">Información de Contacto</h2>
                         <ul class="widget-list">
                             {% if confi.direccion %}
-                            <li>{{ confi.direccion }}</li>
+                                <li>{{ confi.direccion }}</li>
                             {% endif %}
                             {% if confi.telefono %}
-                            <li><a href="tel:{{ confi.telefono }}">{{ confi.telefono }}</a></li>
+                                <li><a href="tel:{{ confi.telefono }}">{{ confi.telefono }}</a></li>
                             {% endif %}
                             {% if confi.telefono2 %}
-                            <li><a href="tel:{{ confi.telefono2 }}">{{ confi.telefono2 }}</a></li>
+                                <li><a href="tel:{{ confi.telefono2 }}">{{ confi.telefono2 }}</a></li>
                             {% endif %}
                             {% if confi.email %}
-                            <li><a style="padding-bottom: 24px;"
-                                   href="mailto:{{ confi.email }}">{{ confi.email }}</a></li>
+                                <li><a style="padding-bottom: 24px;"
+                                       href="mailto:{{ confi.email }}">{{ confi.email }}</a></li>
                             {% endif %}
                         </ul>
                     </div>
@@ -546,7 +520,7 @@
 <script src="/static/sitio/assets/js/plugins/jquery-ui.min.js"></script>
 <script src="/static/sitio/assets/js/plugins/jquery.countdown.min.js"></script>
 <script src="/static/sitio/assets/js/plugins/jquery.magnific-popup.min.js"></script>
-<script src="/static/sitio/assets/js/main.js"></script>
+<script src="/static/sitio/assets/js/main.js?2"></script>
 {# Alert dialogs #}
 <script type="text/javascript" src="/static/alertsDialogsMobile/alertDialogMaterialDesign/dist/duDialog.js"></script>
 <script src='/static/alertsDialogsMobile/alertDialogCupertino/js/component.js'></script>
@@ -567,6 +541,11 @@
 <link href="/static/select2/select2.min.css?13" rel="stylesheet">
 <script src="/static/select2/select2.min.js"></script>
 <script src="/static/select2/i18n/es.js?0.2"></script>
+    <!-- Import Google Font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"
+          id="google-font">
 <script>
 
     window.onload = function () {

@@ -40,51 +40,6 @@ class Usuario(AbstractUser, ModeloBase):
     def check_password_moodle(self, pwd):
         return self.passmoodle == md5(pwd.encode("utf-8")).hexdigest()
 
-    def crear_usuario_moodle(self):
-        from moodle import moodle
-        from core.funciones import generar_nombre
-        tipourl = 1
-        if not self.idusermoodle:
-            contador, cursoid = 0, self.idusermoodle
-            try:
-                contador += 1
-                bandera, persona = 0, self
-                username = persona.username
-
-                bestudiante = moodle.BuscarUsuario(0, tipourl, 'username', username)
-                estudianteid = 0
-
-                if not bestudiante:
-                    bestudiante = moodle.BuscarUsuario(0, tipourl, 'username', username)
-
-                if bestudiante['users']:
-                    if 'id' in bestudiante['users'][0]:
-                        estudianteid = bestudiante['users'][0]['id']
-                else:
-                    idnumber_user = persona.documento
-                    notuser = moodle.BuscarUsuario(0, tipourl, 'idnumber', idnumber_user)
-                    if not notuser:
-                        notuser = moodle.BuscarUsuario(0, tipourl, 'idnumber', idnumber_user)
-
-                    bestudiante = moodle.CrearUsuario(0, tipourl, u'%s' % persona.username,
-                                                      u'%s' % persona.documento,
-                                                      u'%s' % persona.first_name,
-                                                      u'%s' % persona.last_name,
-                                                      u'%s' % persona.email,
-                                                      idnumber_user,
-                                                      u'%s' % persona.ciudad.nombre if persona.ciudad else '',
-                                                      u'%s' % persona.ciudad.provincia.pais.nombre if persona.ciudad else '')
-                    estudianteid = bestudiante[0]['id']
-                if estudianteid > 0:
-                    rolest = moodle.EnrolarCurso(0, tipourl, 5, estudianteid, cursoid)
-                    if persona.idusermoodle != estudianteid:
-                        persona.idusermoodle = estudianteid
-                        persona.save()
-                    print('************Estudiante: %s *** %s' % (contador, persona))
-            except Exception as ex:
-                linea_ex = 'Error on line {}'.format(sys.exc_info()[-1].tb_lineno)
-                print(f'Error al crear estudiante: {linea_ex} - {ex}')
-
     # TIPO_DOCUMENTO
     CEDULA = "CEDULA"
     RUC = "RUC"
@@ -111,20 +66,8 @@ class Usuario(AbstractUser, ModeloBase):
     def ciudad_dependent_fields():
         return {'provincia__pais': 'pais', 'provincia': 'provincia'}
 
-    def anios_actual(self):
-        anio_actual = datetime.now().year
-        anio_nacimiento = self.fecha_nacimiento.year if self.fecha_nacimiento else 0
-        return anio_actual - anio_nacimiento
-
     def primernombre(self):
         return self.first_name.split()[0].lower().capitalize()
-
-    def es_cumple(self):
-        hoy = datetime.now()
-        fn = self.fecha_nacimiento
-        if fn:
-            return fn and fn.month == hoy.month and fn.day == hoy.day
-        return False
 
     def get_nombre(self):
         return "{} - {}".format(self.username, self.get_full_name().title(), self.documento if self else "")

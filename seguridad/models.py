@@ -115,6 +115,11 @@ class Configuracion(models.Model):
                                               verbose_name='% Impuesto',
                                               validators=[MinValueValidator(Decimal('0')),
                                                           MaxValueValidator(Decimal('100'))])
+    latitud = models.FloatField(default=0, verbose_name="Negocio Latitud")
+    longitud = models.FloatField(default=0, verbose_name="Negocio Longitud")
+    limite_km_envio = models.FloatField(default=0, verbose_name="Limite de Km que cubre el envio")
+    precio_km_pasado = models.FloatField(default=0, verbose_name="Costo por Km extra")
+    precio_envio = models.FloatField(default=0, verbose_name="Precio Inicial por Envio")
     # PAYPHONE
     payphone_modo = models.BooleanField("Ejecución de Payphone", choices=TIPO_ENTORNO, default=1)
     # PAYPAL

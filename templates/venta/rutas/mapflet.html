@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+<script>
+
+    var mapa = null;
+    var marcador_partida = null;
+    var ruta_actual = null;
+    var coordenadas = [];
+
+    function inicializarMapa(latitud, longitud) {
+        mapa = L.map('mapa').setView([latitud, longitud], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        }).addTo(mapa);
+
+        marcador_partida = L.marker([latitud, longitud]).addTo(mapa);
+        coordenadas.push([latitud, longitud]);
+    }
+
+    function graficarRuta(latitud, longitud, id_pedido, direccion_pedido) {
+        var posicion_destino = [latitud, longitud];
+        coordenadas.push(posicion_destino);
+
+        if (ruta_actual != null) {
+            mapa.removeLayer(ruta_actual);
+        }
+
+        ruta_actual = L.polyline(coordenadas, {color: '#0CA4FF'}).addTo(mapa);
+
+        // Definir el rango de millas alrededor de la ruta de partida
+        var punto_partida = L.latLng(coordenadas[0]);
+        var area = L.circle(punto_partida, 3218.69, { // Radio de 2 millas (3218.69 metros)
+            color: 'blue',
+            opacity: 0.2,
+            fillOpacity: 0.1
+        }).addTo(mapa);
+
+        // Agregar un marcador por cada pedido
+        var marcador_pedido = L.marker([latitud, longitud]).addTo(mapa);
+        marcador_pedido.bindPopup('<strong>ID de pedido:</strong> ' + id_pedido + '<br><strong>Dirección:</strong> ' + direccion_pedido).openPopup();
+
+
+    }
+
+    $(document).ready(function () {
+
+
+        inicializarMapa(parseFloat({{ start_lat }}), parseFloat({{ start_lon }}))
+        graficarRuta(parseFloat({{ start_lat }}), parseFloat({{ start_lon }}), '0', 'Ruta de Partida Skytech');
+
+        $('.graficar').click(function (e) {
+            e.preventDefault();
+            var latitud = parseFloat($(this).data('latitud'));
+            var longitud = parseFloat($(this).data('longitud'));
+            var id_pedido = $(this).data('id');
+            var direccion_pedido = $(this).closest('tr').find('.direccion').text();
+            mapa.setView([latitud, longitud], 12);
+            console.log(latitud, longitud, id_pedido, direccion_pedido)
+            marcador_partida.setLatLng([latitud, longitud]);
+            graficarRuta(latitud, longitud, id_pedido, direccion_pedido);
+        });
+    });
+</script>

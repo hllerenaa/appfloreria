@@ -1,0 +1,137 @@
+{% extends 'sitio/base.html' %}
+{% load l10n %}
+{% load humanize %}
+{% load templatefunctions %}
+{% block head %}
+    <style>
+        {#.card-fields-container{#}
+        {#    height: 951px!important;#}
+        {# }#}
+        .paypal-buttons-context-iframe {
+            height: 1066px !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="breadcrumbs-area position-relative">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="breadcrumb-content position-relative section-content">
+                        <h3 class="title-3">Metodo de Pago</h3>
+                        <ul>
+                            <li><a href="/">Inicio</a></li>
+                            <li><a href="/carrito/">Carrito</a></li>
+                            <li><a href="/checkout/">Confirmación de Pedido</a></li>
+                            <li>Metodo de Pago</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="form-send-money" class="needs-validation container position-relative zindex-2 pt-5 pb-lg-5 pb-md-4 pb-2" style="margin-top: 27px;"
+          method="POST"
+          action="{{ request.path }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="pagar"/>
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                {% if  not confi.paypal_modo %}
+                    <div style="width: 100%" class="alert alert-warning">
+                        <i class="fa fa-warning" aria-hidden="true"></i> El botón de pago está en modo de prueba, durante este modo no se procesará ningún pago.
+                    </div>
+                {% endif %}
+                <h2 class="pb-2 pt-md-2 my-4 mt-lg-5">Confirmación de pago <span
+                        class='fs-base fw-normal text-muted'>({{ detallePedido.count }}
+                    {% if detallePedido.count > 1 or detallePedido.count == 0 %}items{% else %}item{% endif %})</span>
+                </h2>
+                <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3 border-bottom">
+                    Subtotal:<span class="fs-3 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.subtotal|intcomma }}</span>
+                </div>
+                {% if pedido.impuestos_ubicacion %}
+                    <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3">
+                        (+) Precio de Envio:<span
+                            class="fs-5 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos_ubicacion|intcomma }}</span>
+                    </div>
+                {% endif %}
+                <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3">
+                    (+) Impuesto Pago Online:<span
+                        class="fs-5 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos|intcomma }}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4 py-3 border-bottom">
+                    Total:<span
+                        class="fs-3 fw-semibold text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.total|intcomma }}</span>
+                </div>
+                <br>
+                <div id="pp-button" style="text-align:center; position: inherit;!important;"></div>
+                <div style="display: none;">
+                    <button class="btn btn-lg btn-primary w-100 w-sm-auto" id="submit" type="submit">Completar pedido
+                    </button>
+                </div>
+            </div>
+            <!-- Order summary-->
+        </div>
+    </form>
+
+{% endblock %}
+{% block jscript %}
+    <script src="/static/js/forms.js?v=11"></script>
+    <script src="{{ JS_PAYPAL_URL }}"></script>
+    <script>
+        window.onload = function () {
+            paypal.Buttons({
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            reference_id: "{{ pedido.id }}",
+                            amount: {
+                                currency_code: "{{ NOMBRE_MONEDA }}",
+                                value: '{{ pedido.total|unlocalize }}',
+                                breakdown: {
+                                    item_total: {
+                                        "currency_code": "{{ NOMBRE_MONEDA }}",
+                                        "value": "{{ pedido.total|unlocalize }}"
+                                    }
+                                },
+                                items: [
+                                    {% for d in detallePedido %}
+                                        {
+                                            "name": "{{ d.item.nombre }}",
+                                            "unit_amount": {
+                                                "currency_code": "{{ NOMBRE_MONEDA }}",
+                                                "value": "{{ d.precio|unlocalize }}"
+                                            },
+                                            "quantity": "{{ d.cantidad|unlocalize }}",
+                                            "category": "{{ d.item.tipocertificacion.nombre|default:'' }}"
+                                        },
+                                    {% endfor %}
+                                ]
+                            }
+                        }],
+                    });
+                },
+                onApprove: function (data, actions) {
+                    actions.order.authorize().then(function (authorization) {
+                        var authorizationID = authorization.purchase_units[0]
+                            .payments.authorizations[0].id
+                        if ($('#form-send-money').find('input[name=orderID]').length) {
+                            $('#form-send-money').find('input[name=orderID]').val(data.orderID.toString());
+                        } else {
+                            $('#form-send-money').append(`<input type="hidden" name="orderID" value="${data.orderID}" />`);
+                        }
+
+                        if ($('#form-send-money').find('input[name=authorizationID]').length) {
+                            $('#form-send-money').find('input[name=authorizationID]').val(authorizationID);
+                        } else {
+                            $('#form-send-money').append(`<input type="hidden" name="authorizationID" value="${authorizationID}" />`);
+                        }
+
+                        $('#form-send-money').submit();
+                    });
+                }
+            }).render("#pp-button");
+        }
+    </script>
+{% endblock %}

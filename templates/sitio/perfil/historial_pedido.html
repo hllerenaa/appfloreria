@@ -1,0 +1,46 @@
+{% load templatefunctions %}
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Date
+            </th>
+            <th>
+                Observation
+            </th>
+            <th>
+                State
+            </th>
+            <th>
+                File
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for h in historial %}
+            <tr>
+                <td>
+                    {{ h.fecha_hora_registro|date:'d/M/Y H:i' }}
+                </td>
+                <td>
+                    {{ h.detalle|default:''|upper|linebreaksbr }}
+                </td>
+                <td>
+                    {{ h.estado_pedido }}
+                </td>
+                <td>
+                    {% if h.archivo %}
+                        <a target="_blank" class="custom-btn-link p-0"
+                           href="/media/{{ h.archivo }}">
+                            {{ h.archivo_icon }} Click to download the sent file
+                        </a>
+                    {% else %}
+                        Empty
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

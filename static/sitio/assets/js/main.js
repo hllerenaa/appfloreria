@@ -4,7 +4,7 @@
 	   Sticky Menu Activation
 	---------------------------------*/
 	$(window).on('scroll', function () {
-		if ($(this).scrollTop() > 300) {
+		if ($(this).scrollTop() > 75) {
 			$('.header-sticky').addClass('sticky');
 		} else {
 			$('.header-sticky').removeClass('sticky');

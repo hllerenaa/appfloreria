@@ -6,10 +6,10 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <div class="breadcrumb-content position-relative section-content">
-                        <h3 class="title-3">Recuperar nombre de usuario</h3>
+                        <h3 class="title-3">Carrito de Compras</h3>
                         <ul>
                             <li><a href="/">Inicio</a></li>
-                            <li>Formulario de Recuperación</li>
+                            <li>Confirmación de Pedido</li>
                         </ul>
                     </div>
                 </div>
@@ -20,183 +20,182 @@
     <div class="cart-main-wrapper mt-no-text">
         <div class="container custom-area">
             <div class="row">
+                {% if existe_orden %}
+                    <div class="col-lg-12 col-xl-12 order-lg-2">
+                        <div class="alert alert-success" style="font-size: 17px">
+                            <i class="fa fa-shopping-cart"></i> ¡Hola! Queríamos dejarte saber que tienes un Orden de
+                            compra pendiente de confirmar.
+                            Si desea continuar con la compra, tu solo necesitas hacer clic en el siguiente enlace. &nbsp; <a class="btn"
+                                href="/checkout/"><i class="fa fa-check"></i>
+                            Confirmar Compra</a>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="col-lg-12 col-custom">
-                    <!-- Cart Table Area -->
                     <div class="cart-table table-responsive">
-                        {% if request.session.carrito %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Ítems Adicionales</th>
-                <th>Subtotal</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in request.session.carrito %}
-                <tr>
-                    <td>{{ producto.nombre }}</td>
-                    <td>${{ producto.precio }}</td>
-                    <td>{{ producto.cantidad }}</td>
-                    <td>
-                        <ul>
-                            {% for adicional in producto.adicionales %}
-                                <li>{{ adicional.nombre }} - ${{ adicional.precio }}</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                    <td>${{ producto.subtotal }}</td>
-                    <td>
-                        <button class="btn btn-danger eliminar-btn" data-identificador="{{ producto.identificador_unico }}">Eliminar</button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4" class="text-right"><strong>Total:</strong></td>
-                <td>${{ request.session.total }}</td>
-                <td></td>
-            </tr>
-        </tfoot>
-    </table>
-{% else %}
-    <p>Tu carrito está vacío.</p>
-{% endif %}
-
-
-
                         <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="pro-thumbnail">Image</th>
-                                    <th class="pro-title">Product</th>
-                                    <th class="pro-price">Price</th>
-                                    <th class="pro-quantity">Quantity</th>
-                                    <th class="pro-subtotal">Total</th>
-                                    <th class="pro-remove">Remove</th>
-                                </tr>
+                            <thead class="thead-light">
+                            <tr>
+                                <th>Foto</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Ítems Adicionales</th>
+                                <th>Subtotal</th>
+                                <th>Acción</th>
+                            </tr>
                             </thead>
                             <tbody>
+                            {% for producto in request.session.carrito %}
                                 <tr>
-                                    <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="assets/images/product/small-size/1.jpg" alt="Product" /></a></td>
-                                    <td class="pro-title"><a href="#">Pearly Everlasting <br> s / green</a></td>
-                                    <td class="pro-price"><span>$295.00</span></td>
-                                    <td class="pro-quantity">
-                                        <div class="quantity">
-                                            <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" value="0" type="text">
-                                                <div class="dec qtybutton">-</div>
-                                                <div class="inc qtybutton">+</div>
-                                                <div class="dec qtybutton"><i class="fa fa-minus"></i></div>
-                                                <div class="inc qtybutton"><i class="fa fa-plus"></i></div>
-                                            </div>
-                                        </div>
+                                    <td class="pro-thumbnail">
+                                        <a href="#">
+                                            <img class="img-fluid" src="/media/{{ producto.foto }}" alt="Product"/>
+                                        </a>
                                     </td>
-                                    <td class="pro-subtotal"><span>$295.00</span></td>
-                                    <td class="pro-remove"><a href="#"><i class="lnr lnr-trash"></i></a></td>
+                                    <td class="pro-title">{{ producto.nombre }}</td>
+                                    <td class="pro-price"><span>${{ producto.precio }}</span></td>
+                                    <td>{{ producto.cantidad }}</td>
+                                    <td>
+                                        <table class="table">
+                                            <tbody>
+                                            {% for adicional in producto.adicionales %}
+                                                <tr>
+                                                    <td class="text-center">{{ adicional.nombre }}</td>
+                                                    <td class="text-center">${{ adicional.precio }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td>${{ producto.subtotal }}</td>
+                                    <td class="pro-remove"><a href="javascript:void(0)" class="eliminar-btn tr"
+                                                              title="Eliminar Item"
+                                                              data-identificador="{{ producto.identificador_unico }}"><i
+                                            class="lnr lnr-trash text-danger"></i></a></td>
                                 </tr>
+                            {% empty %}
                                 <tr>
-                                    <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="assets/images/product/small-size/2.jpg" alt="Product" /></a></td>
-                                    <td class="pro-title"><a href="#">Jack in the Pulpit <br> red</a></td>
-                                    <td class="pro-price"><span>$275.00</span></td>
-                                    <td class="pro-quantity">
-                                        <div class="quantity">
-                                            <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" value="0" type="text">
-                                                <div class="dec qtybutton">-</div>
-                                                <div class="inc qtybutton">+</div>
-                                                <div class="dec qtybutton"><i class="fa fa-minus"></i></div>
-                                                <div class="inc qtybutton"><i class="fa fa-plus"></i></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="pro-subtotal"><span>$550.00</span></td>
-                                    <td class="pro-remove"><a href="#"><i class="lnr lnr-trash"></i></a></td>
+                                    <th colspan="10" class="text-center">Tu carrito está vacío</th>
                                 </tr>
-                                <tr>
-                                    <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="assets/images/product/small-size/3.jpg" alt="Product" /></a></td>
-                                    <td class="pro-title"><a href="#">Glory of the Snow <br> s</a></td>
-                                    <td class="pro-price"><span>$295.00</span></td>
-                                    <td class="pro-quantity">
-                                        <div class="quantity">
-                                            <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" value="0" type="text">
-                                                <div class="dec qtybutton">-</div>
-                                                <div class="inc qtybutton">+</div>
-                                                <div class="dec qtybutton"><i class="fa fa-minus"></i></div>
-                                                <div class="inc qtybutton"><i class="fa fa-plus"></i></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="pro-subtotal"><span>$295.00</span></td>
-                                    <td class="pro-remove"><a href="#"><i class="lnr lnr-trash"></i></a></td>
-                                </tr>
-                                <tr>
-                                    <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="assets/images/product/small-size/4.jpg" alt="Product" /></a></td>
-                                    <td class="pro-title"><a href="#">Rose bouquet white</a></td>
-                                    <td class="pro-price"><span>$110.00</span></td>
-                                    <td class="pro-quantity">
-                                        <div class="quantity">
-                                            <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" value="2" type="text">
-                                                <div class="dec qtybutton">-</div>
-                                                <div class="inc qtybutton">+</div>
-                                                <div class="dec qtybutton"><i class="fa fa-minus"></i></div>
-                                                <div class="inc qtybutton"><i class="fa fa-plus"></i></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="pro-subtotal"><span>$110.00</span></td>
-                                    <td class="pro-remove"><a href="#"><i class="lnr lnr-trash"></i></a></td>
-                                </tr>
+                            {% endfor %}
                             </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="5"></td>
+                                <td class="text-center" style="font-weight: 700">${{ request.session.total }}</td>
+                                <td></td>
+                            </tr>
+                            </tfoot>
                         </table>
                     </div>
-                    <!-- Cart Update Option -->
-                    <div class="cart-update-option d-block d-md-flex justify-content-between">
-                        <div class="apply-coupon-wrapper">
-                            <form action="#" method="post" class=" d-block d-md-flex">
-                                <input type="text" placeholder="Enter Your Coupon Code" required />
-                                <button class="btn flosun-button primary-btn rounded-0 black-btn">Apply Coupon</button>
-                            </form>
-                        </div>
-                        <div class="cart-update mt-sm-16">
-                            <a href="#" class="btn flosun-button primary-btn rounded-0 black-btn">Update Cart</a>
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-5 ml-auto col-custom">
-                    <!-- Cart Calculation Area -->
-                    <div class="cart-calculator-wrapper">
-                        <div class="cart-calculate-items">
-                            <h3>Cart Totals</h3>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <tr>
-                                        <td>Sub Total</td>
-                                        <td>$230</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Shipping</td>
-                                        <td>$70</td>
-                                    </tr>
-                                    <tr class="total">
-                                        <td>Total</td>
-                                        <td class="total-amount">$300</td>
-                                    </tr>
-                                </table>
+            {% if request.session.carrito %}
+                <br>
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-lg-8 col-xl-8 order-lg-2">
+                        <h2 style="font-weight: 600; font-size: 20px;margin-top: 0.1rem!important;">Seleccione el lugar
+                            Entrega</h2>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-light"><i class="fa fa-map-marked"></i>
+                                    Por favor, en el siguiente cuadro de texto, indicar la ubicación del terreno donde
+                                    será
+                                    el entregado el pedido,
+                                    en el lado derecho esta ubicación se desglosará para mejor precisión.
+                                </div>
+                                <input id="autocomplete"
+                                       placeholder="Write your address" class="form-control"
+                                       type="hidden"/>
+                                <div style="display: none;" id="googleMapDestiny">
+                                    <div style="width: 100%;height: 500px;"
+                                         id="googleMapLayout"></div>
+                                </div>
+                                <div id="mapagoogle"
+                                     style="width: 100%; left: -29px; top: 20px; position: inherit; height: 80%;">
+                                    <a onclick="buscarEnMapa()">
+                                        <img src="/static/location3.gif" width="100%"
+                                             id="imagenmapa">
+                                    </a>
+                                </div>
+                                <center>
+                                    <a style="font-size: 15px;" onclick="buscarEnMapa()"
+                                       href="javascript:void(0)">
+                                        <b id="btnBuscarEnElMapa"><i class="fa fa-image"></i> Ubicación establecida,
+                                            haga
+                                            clic aquí para buscar nuevamente</b>
+                                    </a>
+                                </center>
                             </div>
                         </div>
-                        <a href="checkout.html" class="btn flosun-button primary-btn rounded-0 black-btn w-100">Proceed To Checkout</a>
+                    </div>
+                    <div class="col-lg-4 col-xl-4 order-lg-2 sidebar-block">
+                        <form id="frmPedido" action="{{ request.path }}" method="post">{% csrf_token %}
+                            <input type="hidden" name="action" value="saveorder">
+                            <h2 style="font-weight: 600; font-size: 20px;margin-top: 0.1rem!important;">Detalle de
+                                Entrega</h2>
+                            <span class="text-black-transparent-1">Porcentaje extra para pedidos mayores a {{ confi.limite_km_envio }} Km.</span>
+                            <input type="hidden" id="id_latitud" name="latitud" value="0">
+                            <input type="hidden" id="id_longitud" name="longitud" value="0">
+                            <table class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+                                <tbody>
+                                <tr>
+                                    <th colspan="2">Fecha en la que quiero recibir mi pedido: <br>
+                                        <input required type="date" value="" name="dateatt" class="form-control"
+                                               id="dateatt">
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="2">Dirección 1: <br>
+                                        <textarea name="add1" id="id_add1"
+                                                  placeholder="Ejemplo: Avenida 17 de Septiembre"
+                                                  rows="2"
+                                                  class="form-control" required></textarea>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="2">Dirección 2: <br>
+                                        <textarea name="add2" id="id_add2"
+                                                  placeholder="Ejemplo: Avenida 17 de Septiembre" rows="2"
+                                                  class="form-control" required></textarea>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" style="padding-right: 12px;">Ciudad: <br>
+                                        <input name="city" id="id_city" placeholder="Ejemplo: Milagro"
+                                               class="form-control" required>
+                                    </th>
+                                    <th scope="row">Provincia: <br>
+                                        <input name="state" id="id_state"
+                                               placeholder="Ejemplo: Guayas"
+                                               class="form-control" required>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" scope="row" style="padding-right: 12px;">Zip Code: <br>
+                                        <input type="text" name="zipcode" id="id_zipcode"
+                                               placeholder="Ejemplo: 01035"
+                                               class="form-control" required>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="2">Referencia: <br>
+                                        <textarea name="reference" id="id_reference"
+                                                  placeholder="Referencia" rows="6"
+                                                  class="form-control" required></textarea>
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <button type="submit" class="btn flosun-button primary-btn rounded-0 black-btn w-100"><i
+                                    class="fa fa-shopping-cart"></i> Confirmar Pedido
+                            </button>
+                        </form>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -204,34 +203,307 @@
 {% endblock %}
 {% block jscript %}
     <script>
-        $('#frm-restaurar').on({
-            submit: function (e) {
-                e.preventDefault();
-                var frmData = new FormData($(this)[0]);
-                $.ajax({
-                    url: '{{ request.path }}',
-                    data: frmData,
-                    method: 'POST',
-                    dataType: 'json',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function () {
-                        pantallaespera()
-                    }
-                }).done(function (data) {
-                    setTimeout($.unblockUI, 1);
-                    if (data.resp === true) {
-                        location = "/login/";
-                        return false;
+        var orden = {lat: '', long: '', cantidad: 0, precio: 0, total_items: 0, subtotal: 0, items: []}
+        var lista_items = [];
+        var idAndValues = {};
+
+        $(function () {
+            $('#frmPedido').on({
+                submit: function (e) {
+                    e.preventDefault();
+                    if ($('#dateatt').val()) {
+                        var frmData2 = new FormData($(this)[0]);
+                        $.ajax({
+                            url: '{{ request.path }}',
+                            type: 'POST',
+                            data: frmData2,
+                            beforeSend: function () {
+                                pantallaespera();
+                            },
+                            success: function (data) {
+                                object = JSON.parse(data)
+                                if (object.resp) {
+                                    location = object.to
+                                } else {
+                                    mensajeDanger(object.mensaje);
+                                }
+                                $.unblockUI();
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                        }).fail(function () {
+                            $.unblockUI();
+                            mensajeDanger("try again");
+                        });
                     } else {
-                        mensajeDanger(data.error);
+                        mensajeDanger("Select a date in the calendar");
                     }
-                }).fail(function () {
-                    setTimeout($.unblockUI, 1);
-                    mensajeDanger('Error de conexión.')
+                }
+            });
+
+            $('.eliminar-btn').click(function () {
+                pantallaespera();
+                const identificador = $(this).data('identificador');
+                $.ajax({
+                    url: '{{ request.path }}', // Asegúrate de sustituir con la URL correcta
+                    type: 'POST',
+                    data: {'identificador_unico': identificador, 'action': 'delitem'},
+                    success: function (response) {
+                        $.unblockUI();
+                        if (response.resp) {
+                            location.reload(); // Recargar la página para actualizar el carrito
+                        } else {
+                            alertaDanger(response.mensaje); // Hubo un error al agregar el producto
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                        console.error('Error:', error);
+                    }
                 });
+
+
+            });
+        })
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAP_API_KEY }}&libraries=places,geocoding"></script>
+    <script>
+        var markerPoint;
+        var marker;
+        const latLongEcuador = {lat: -1.574876, lng: -78.636631};
+        const inputLatitud = "id_latitud";
+        const inputLongitud = "id_longitud";
+        {#const latLongCli = {lat: {{ perfil.latitudstr }}, lng: {{ perfil.longitudstr }}};#}
+
+        function geocodePosition(pos) {
+            geocoder.geocode({
+                latLng: pos
+            }, function (responses) {
+                if (responses && responses.length > 0) {
+                    marker.formatted_address = responses[0].formatted_address;
+                    var street_number = '';
+                    var route = '';
+                    var city = '';
+                    var state = '';
+                    var postal_code = '';
+                    var parcel_number = '';
+
+                    for (var i = 0; i < responses[0].address_components.length; i++) {
+                        var component = responses[0].address_components[i];
+                        if (component.types.includes('street_number')) {
+                            street_number = component.long_name;
+                        } else if (component.types.includes('route')) {
+                            route = component.long_name;
+                        } else if (component.types.includes('locality') || component.types.includes('administrative_area_level_3')) {
+                            city = component.long_name;
+                        } else if (component.types.includes('administrative_area_level_1')) {
+                            state = component.long_name;
+                        } else if (component.types.includes('postal_code')) {
+                            postal_code = component.long_name;
+                        } else if (component.types.includes('parcel_number')) {
+                            parcel_number = component.long_name;
+                        }
+                    }
+                    if (street_number) {
+                        if (route) {
+                            $('#id_add1').val(street_number + ' ' + route);
+                        } else {
+                            $('#id_add1').val(street_number);
+                        }
+                    } else {
+                        if (route) {
+                            $('#id_add1').val(route);
+                        }
+                    }
+                    $('#id_add2').val(route);
+                    $('#id_city').val(city);
+                    $('#id_state').val(state);
+                    $('#id_zipcode').val(postal_code);
+                    {#$('#id_parcelnumber').val(parcel_number);#}
+                    $('#autocomplete').val(responses[0].formatted_address)
+                } else {
+                    marker.formatted_address = 'No se pudo encontrar esta dirección';
+                }
+            });
+        }
+
+        function buscarEnMapa() {
+            $('#mapagoogle').hide();
+            var btn = document.querySelector("#btnBuscarEnElMapa");
+            var contenido = btn.innerHTML;
+            btn.setAttribute('enabled', false);
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>  <strong>Buscando...</strong>';
+
+            geocoder = new google.maps.Geocoder();
+            map = new google.maps.Map(document.getElementById('googleMapLayout'), {
+                zoom: 4,
+                center: latLongEcuador,
+                mapTypeId: "roadmap"
+            });
+
+
+            document.getElementById('googleMapDestiny').style.display = null;
+            const input = document.getElementById("autocomplete");
+            $('#autocomplete').attr({"type": "text"});
+            const search = new google.maps.places.Autocomplete(input);
+            search.bindTo('bounds', map);
+            search.addListener('place_changed', function () {
+                var place = search.getPlace();
+                if (!place.geometry.viewport) {
+                    Swal.fire('Error al mostrar el lugar', '{{ nombreempresa }}', 'error');
+                    return;
+                }
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                }
+                if (typeof marker === 'undefined') {
+                    marker = new google.maps.Marker({
+                        map: map,
+                        draggable: true,
+                        animation: google.maps.Animation.DROP,
+                        title: 'Tus pedidos llegarán aquí. Puedes modificarlo en cualquier momento. (Puedes mover este punto)',
+                        position: place.geometry.location
+                    });
+                    google.maps.event.addListener(marker, 'drag', function (event) {
+                        geocodePosition(marker.getPosition());
+                        document.getElementById(inputLatitud).value = event.latLng.lat().toString();
+                        document.getElementById(inputLongitud).value = event.latLng.lng().toString();
+                        $('#latstr').html(place.geometry.location.lat().toString())
+                        $('#longstr').html(place.geometry.location.lng().toString())
+                    });
+                }
+
+                marker.setPosition(place.geometry.location);
+                document.getElementById(inputLatitud).value = place.geometry.location.lat().toString();
+                document.getElementById(inputLongitud).value = place.geometry.location.lng().toString();
+                $('#latstr').html(place.geometry.location.lat().toString())
+                $('#longstr').html(place.geometry.location.lng().toString())
+                if (place.formatted_address) {
+                    {#$('#id_direccion').val(place.formatted_address)#}
+
+                    var street_number = '';
+                    var route = '';
+                    var city = '';
+                    var state = '';
+                    var postal_code = '';
+                    var parcel_number = ''; // Asegúrate de que este valor esté disponible y sepa el tipo correcto para buscar
+
+
+                    for (var i = 0; i < place.address_components.length; i++) {
+                        var component = place.address_components[i];
+                        if (component.types.includes('street_number')) {
+                            street_number = component.long_name;
+                        } else if (component.types.includes('route')) {
+                            route = component.long_name;
+                        } else if (component.types.includes('locality') || component.types.includes('administrative_area_level_3')) {
+                            city = component.long_name;
+                        } else if (component.types.includes('administrative_area_level_1')) {
+                            state = component.long_name;
+                        } else if (component.types.includes('postal_code')) {
+                            postal_code = component.long_name;
+                        } else if (component.types.includes('parcel_number')) {
+                            parcel_number = component.long_name;
+                        }
+                    }
+
+                    $('#id_add1').val(street_number + ' ' + route);
+                    $('#id_add2').val(route);
+                    $('#id_city').val(city);
+                    $('#id_state').val(state);
+                    $('#id_zipcode').val(postal_code);
+                    {#$('#id_parcelnumber').val(parcel_number);#}
+                }
+            })
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    document.getElementById(inputLatitud).value = position.coords.latitude.toString();
+                    document.getElementById(inputLongitud).value = position.coords.longitude.toString();
+                    $('#latstr').html(position.coords.latitude.toString())
+                    $('#longstr').html(position.coords.longitude.toString())
+                    map.setCenter({lat: position.coords.latitude, lng: position.coords.longitude});
+                    map.setZoom(15);
+                    try {
+                        marker.setMap(null);
+                    } catch (e) {
+                    }
+                    var infowindow = new google.maps.InfoWindow({
+                        content: "Marca el lugar donde se realizará el vuelo."
+                    });
+                    marker = new google.maps.Marker({
+                        map: map,
+                        draggable: true,
+                        animation: google.maps.Animation.DROP,
+                        title: 'Tus pedidos llegarán aquí. Puedes modificarlo en cualquier momento. (Puedes mover este punto)',
+                        position: {lat: position.coords.latitude, lng: position.coords.longitude}
+                    });
+                    google.maps.event.addListener(marker, 'drag', function (event) {
+                        geocodePosition(marker.getPosition());
+                        document.getElementById(inputLatitud).value = event.latLng.lat().toString();
+                        document.getElementById(inputLongitud).value = event.latLng.lng().toString();
+                        $('#latstr').html(event.latLng.lat().toString())
+                        $('#longstr').html(event.latLng.lng().toString())
+                    });
+                    infowindow.open(map, marker);
+                    btn.innerHTML = '<strong><i class="fa fa-check-circle"></i> Ubicación establecida, haga clic aquí para buscar nuevamente. </strong>';
+                    btn.setAttribute('enabled', true);
+                    geocodePosition({lat: position.coords.latitude, lng: position.coords.longitude});
+                }, function (error) {
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            Swal.fire({
+                                title: 'Activa la ubicación de esta página, si has denegado el acceso en tu navegador para rastrear tu ubicación\n actívala nuevamente ingresando a \n Configuración > Privacidad > Ubicación\n y permite el acceso a este sitio.',
+                                text: '{{ nombreempresa }} necesita tu ubicación para poder enviarte el pedido',
+                                type: 'error',
+                                allowOutsideClick: false,
+                            })
+                            break;
+
+                        case error.POSITION_UNAVAILABLE:
+                            Swal.fire({
+                                title: 'Hay un problema para obtener la posición del dispositivo.',
+                                text: '{{ nombreempresa }}',
+                                type: 'error',
+                                allowOutsideClick: false,
+                            })
+                            break;
+
+                        case error.TIMEOUT:
+                            Swal.fire({
+                                title: 'La aplicación agotó el tiempo de espera al intentar obtener la posición del dispositivo.',
+                                text: '{{ nombreempresa }}',
+                                type: 'error',
+                                allowOutsideClick: false,
+                            })
+                            break;
+
+                        default:
+                            Swal.fire({
+                                title: 'Error, intentelo nuevamente.',
+                                text: '{{ nombreempresa }}',
+                                type: 'error',
+                                allowOutsideClick: false,
+                            })
+                            break;
+                    }
+                    btn.innerHTML = contenido;
+                    btn.setAttribute('enabled', true);
+                });
+            } else {
+                Swal.fire({
+                    title: 'Cambiar de navegador (preferiblemente Google Chrome).',
+                    text: '{{ nombreempresa }}',
+                    type: 'error',
+                    allowOutsideClick: false,
+                })
             }
+        }
+
+        $(document).ready(function () {
+            buscarEnMapa();
         });
     </script>
 {% endblock %}

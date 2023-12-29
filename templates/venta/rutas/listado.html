@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load templatefunctions %}
+{% block content %}
+    <form method="GET">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col-md-4 col-sm-12">
+                    <input type="date" class="form-control" name="fecha" id="id_fecha" title="Date"
+                           value="{{ fecha }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="input-group mb-3">
+                        <select class="select2" name="piloto" id="piloto" style="width: 90%">
+                            {% for l in pilotos %}
+                                <option value="{{ l.id }}" {% if l.id == piloto %}selected{% endif %}>{{ l }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" id="button-addon2"><i
+                                    class="fa fa-search"></i></button>
+                            {% if url_vars %}
+                                <a title="Ver todo" href="{{ ruta }}?{{ dict_url_vars }}" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th colspan="10"><i class="fa fa-cart-shopping"></i> Orders</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th class="text-center">Order #</th>
+                    <th class="text-center">Client</th>
+                    <th class="text-center">Creation date</th>
+                    <th class="text-center">Service date <br> registered by customer</th>
+                    <th class="text-center">Latitude</th>
+                    <th class="text-center">Length</th>
+                    <th class="text-center">Miles</th>
+                    <th class="text-center">Address</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for pedido in listado %}
+                    <tr id="{{ pedido.id }}">
+                        <td class="text-center">
+                            <a href="javascript:;" class="btn-link graficar" data-latitud="{{ pedido.latitud_str }}"
+                               data-id="{{ pedido.id }}"
+                               data-longitud="{{ pedido.longitud_str }}">
+                                <i class="fa fa-map-marker"></i> Add to map
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <b>{{ pedido.id }}</b>
+                            <div>
+                                {% if pedido.trabajo_completado %}
+                                    <span class="text-success">
+                                        <i class="fa-solid fa-plane-circle-check"></i> Marked as completed
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-left">
+                            <i class="fa fa-user"></i> {{ pedido.user }} <br>
+                            <i class="fa fa-phone"></i> {{ pedido.user.telefono }} <br>
+                            <i class="fa fa-mail-bulk"></i> <a href="mailto:{{ pedido.user.email }}" target="_blank">{{ pedido.user.email }}</a>
+                        </td>
+                        <td class="text-center">{{ pedido.fecha_registro|date:'d/m/Y' }}</td>
+                        <td class="text-center">{{ pedido.festimada|date:'d/m/Y' }}</td>
+                        <td class="text-center">{{ pedido.latitud }}</td>
+                        <td class="text-center">{{ pedido.longitud }}</td>
+                        <td class="text-center">{{ pedido.millas_totales }}</td>
+                        <td class="text-center">
+                            <div class="direccion">{{ pedido.direccion }}</div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <span class="label label-success" style="font-size: 15px"><b id="millas_totales">000</b> miles</span>
+            <hr>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div id="mapa" style="height: 1200px;"></div>
+                </div>
+                <div class="col-lg-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th colspan="2"><i class="fa fa-map-location"></i> Roadmap</th>
+                        </tr>
+                        </thead>
+                        <tbody class="rutadet">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalDetalle">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <form method="post" enctype="multipart/form-data" action="{{ ruta }}"
+                      class="form-horizontal form-label-left">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h4 class="modal-title"><b id="modalNombre"></b></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body detalleProd">
+                    </div>
+                    <div class="modal-footer" id="footerModalView">
+                        <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
+                                class="fa fa-window-close"></i>
+                            Close</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <link rel="stylesheet" href="/static/lightbox/css/lightbox.min.css">
+    <script src="/static/lightbox/js/lightbox-plus-jquery.min.js"></script>
+{% endblock %}
+
+{% block jscript %}
+    <script src="/static/js/forms.js?v=11"></script>
+    <script>
+        function formModal(id, text, action, footer = false) {
+            pantallaespera()
+            $('#footerModalView').hide();
+            $.ajax({
+                type: "GET",
+                url: `{{ request.path }}`,
+                data: {
+                    'action': action,
+                    'id': id,
+                },
+                success: function (data) {
+                    setTimeout($.unblockUI, 1);
+                    if (data.result === true) {
+                        if (footer) {
+                            $('#footerModalView').show();
+                        }
+                        $('#modalNombre').html(text);
+                        $('.detalleProd').html(data.data);
+                        $('#modalDetalle').modal({backdrop: 'static'}).modal('show');
+                    } else {
+                        mensajeWarning(data.message);
+                    }
+                },
+                error: function () {
+                    setTimeout($.unblockUI, 1);
+                    mensajeWarning("Error de conexión.");
+                },
+                dataType: "json"
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAP_API_KEY }}"></script>
+
+    <script>
+        var mapa = null;
+        var marcador_partida = null;
+        var ruta_actual = null;
+        var coordenadas = [];
+        var millas_totales = 0;
+        var directionsService = new google.maps.DirectionsService();
+        var directionsDisplay = new google.maps.DirectionsRenderer();
+        var trayectorias_guardadas = [];
+        var ids_list = [];
+
+        function inicializarMapa(latitud, longitud) {
+            mapa = new google.maps.Map(document.getElementById('mapa'), {
+                center: {lat: latitud, lng: longitud},
+                zoom: 8
+            });
+            marcador_partida = new google.maps.Marker({
+                position: {lat: latitud, lng: longitud},
+                map: mapa,
+                title: `{{ nombreempresa }}`
+            });
+            coordenadas.push({lat: latitud, lng: longitud});
+            var millas = {{ limite_envio }};
+            var metrosPorMilla = 1609.34;
+            // Definir el rango de millas alrededor de la ruta de partida
+            var punto_partida = new google.maps.LatLng(coordenadas[0]);
+            var area = new google.maps.Circle({
+                map: mapa,
+                center: punto_partida,
+                radius: millas * metrosPorMilla,
+                strokeColor: 'blue',
+                strokeOpacity: 0.2,
+                strokeWeight: 2,
+                fillColor: 'blue',
+                fillOpacity: 0.1
+            });
+        }
+
+        function graficarRuta(latitud, longitud, id_pedido, direccion_pedido) {
+            var posicion_destino = {lat: latitud, lng: longitud};
+
+            if (ruta_actual && ruta_actual.directions && ruta_actual.directions.routes && ruta_actual.directions.routes.length > 0) {
+                // Validar que la posición no se repita en el arreglo de coordenadas
+                var posicion_repetida = false;
+                for (var i = 0; i < coordenadas.length; i++) {
+                    if (coordenadas[i].lat == posicion_destino.lat && coordenadas[i].lng == posicion_destino.lng) {
+                        posicion_repetida = true;
+                        break;
+                    }
+                }
+                if (posicion_repetida) {
+                    alertaDanger('Position already exists in the route')
+                    return;
+                }
+            }
+
+            coordenadas.push(posicion_destino);
+            ids_list.push(id_pedido);
+
+            var waypoints = [];
+            for (var i = 1; i < coordenadas.length - 1; i++) {
+                waypoints.push({
+                    location: new google.maps.LatLng(coordenadas[i]),
+                    stopover: true
+                });
+            }
+
+            var request = {
+                origin: new google.maps.LatLng(coordenadas[0]),
+                destination: new google.maps.LatLng(posicion_destino),
+                waypoints: waypoints,
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, function (response, status) {
+                if (status === 'OK') {
+                    if (ruta_actual != null) {
+                        ruta_actual.setDirections(response);
+                    } else {
+                        directionsDisplay.setDirections(response);
+                        ruta_actual = directionsDisplay;
+                    }
+                    // Actualizar el total de millas recorridas
+                    var metros_totales = 0;
+                    for (var i = 0; i < ruta_actual.directions.routes[0].legs.length; i++) {
+                        metros_totales += ruta_actual.directions.routes[0].legs[i].distance.value;
+                    }
+                    millas_totales = metros_totales * 0.000621371; // Convertir de metros a millas
+                    $('#millas_totales').text(millas_totales.toFixed(2)); // Mostrar el total de millas en un elemento div
+                }
+            });
+
+            if (ruta_actual == null) {
+                directionsDisplay.setMap(mapa);
+                ruta_actual = directionsDisplay;
+            }
+        }
+
+        function quitarRuta(indice) {
+            // Eliminar la coordenada correspondiente del arreglo de coordenadas
+            coordenadas.splice(indice, 1);
+
+            // Volver a graficar la ruta con las coordenadas restantes
+            var waypoints = [];
+            for (var i = 1; i < coordenadas.length - 1; i++) {
+                waypoints.push({
+                    location: new google.maps.LatLng(coordenadas[i]),
+                    stopover: true
+                });
+            }
+
+            var request = {
+                origin: new google.maps.LatLng(coordenadas[0]),
+                destination: new google.maps.LatLng(coordenadas[coordenadas.length - 1]),
+                waypoints: waypoints,
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, function (response, status) {
+                if (status === 'OK') {
+                    ruta_actual.setDirections(response);
+
+                    // Actualizar el total de millas recorridas
+                    var metros_totales = 0;
+                    for (var i = 0; i < ruta_actual.directions.routes[0].legs.length; i++) {
+                        metros_totales += ruta_actual.directions.routes[0].legs[i].distance.value;
+                    }
+                    millas_totales = metros_totales * 0.000621371; // Convertir de metros a millas
+                    $('#millas_totales').text(millas_totales.toFixed(2)); // Mostrar el total de millas en un elemento div
+                }
+            });
+        }
+
+        $(function () {
+
+            inicializarMapa(parseFloat({{ start_lat }}), parseFloat({{ start_lon }}));
+
+            $('.graficar').click(async function (e) {
+                e.preventDefault();
+                const latitud = parseFloat($(this).data('latitud'));
+                const longitud = parseFloat($(this).data('longitud'));
+                const id_pedido = $(this).data('id');
+                const direccion_pedido = $(this).closest('tr').find('.direccion').text();
+
+                console.log(latitud, longitud, id_pedido, direccion_pedido);
+
+
+                $('.rutadet').html('');
+                const data = await jsonGetRequest('', {'action': 'pedido_detail', 'id_pedido': id_pedido});
+                if (data.result) {
+                    coordenadas = [];
+                    inicializarMapa(parseFloat(data.pilot_latitud), parseFloat(data.pilot_longitud));
+                    mapa.setCenter({lat: latitud, lng: longitud});
+                    marcador_partida.setPosition({lat: latitud, lng: longitud});
+                    graficarRuta(latitud, longitud, id_pedido, direccion_pedido);
+                    $('.rutadet').append(`
+                        <tr>
+                            <td>
+                                <b>Service date registered by customer:</b>
+                            </td>
+                            <td>
+                                <div>
+                                    ${data.date_service} <b>Time:</b> ${data.time_str} <b>Driving Time:</b> ${data.tiempo_de_viaje_str} <b>Total Time:</b> ${data.tiempo_total_de_trabajo_str}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Client Address:</b>
+                            </td>
+                            <td>
+                                <div>${data.direccion}</div>
+                                <div>
+                                    <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${latitud},${longitud}">
+                                        <i class="fa-solid fa-map-location-dot"></i> Open Client Address in G-Maps
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" colspan="2">
+                                <b>Order Detail</b>
+                            </td>
+                        </tr>
+                    `);
+                    $('.rutadet').append(data.pedido_detalle_html);
+                }
+            });
+        })
+
+    </script>
+    <script>
+        async function markAsOnTheWay(_ctr) {
+            const ctr = $(_ctr);
+            const pedido_id = ctr.attr("data-pedido_id");
+            const on_the_way = ctr.attr("data-ontheway") === "1";
+            const data = await jsonGetRequest('', {'action': 'on_the_way', 'pedido_id': pedido_id, 'on_the_way': on_the_way});
+            if (data.on_the_way === true) {
+                ctr.attr("data-ontheway", "1");
+                ctr.attr("class", "text-warning");
+                ctr.html(`<b><i class="fa-solid fa-person-walking-arrow-right"></i> Yes, on the way</b>`);
+            } else if (data.on_the_way === false){
+                ctr.attr("data-ontheway", "0");
+                ctr.attr("class", "text-success");
+                ctr.html(`<b><i class="fa-regular fa-hand"></i> Clic to mark as "on the way"</b>`);
+            } else {
+                mensajeDanger("Error");
+            }
+        }
+    </script>
+
+    {#<tr>#}
+    {#    <td>#}
+    {#        <b>Pilot Location:</b>#}
+    {#    </td>#}
+    {#    <td>#}
+    {#        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${data.pilot_latitud},${data.pilot_longitud}">#}
+    {#            <i class="fa-solid fa-map-location-dot"></i> Open Pilot Location in G-Maps#}
+    {#        </a>#}
+    {#    </td>#}
+    {#</tr>#}
+{% endblock %}

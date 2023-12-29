@@ -1,0 +1,74 @@
+{% load humanize %}
+{% load templatefunctions %}
+{% with producto=pedido.traerProducto.item %}
+{% with detalle=pedido.traerProducto %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="d-sm-flex align-items-center py-1">
+                <div class="w-100 pt-1">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <h3 class="h6 mb-1">
+                                {{ producto.nombre }} <b>X</b> {{ detalle.cantidad }}
+                            </h3>
+                        </div>
+                        <div class="text-end ms-auto">
+                            <div class="fs-5 mb-1">{{ SIMBOLO_MONEDA }}{{ pedido.precio_base|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if detalle.detalle %}
+                {% for l in detalle.detalle %}
+                    <div class="d-flex align-items-center justify-content-between border-top pt-2 py-1">
+                            <span>
+                                {{ l.items_adicionales.nombre }}:
+                                {% if l.items_adicionales.descripcion %}<br>
+                                    <span class="text-muted">{{ l.items_adicionales.descripcion }}</span>
+                                {% endif %}
+                            </span>
+                        <span class="fs-5 text-dark ms-2">{{ SIMBOLO_MONEDA }}{{ l.total|intcomma }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <ul class="list-unstyled py-3 mb-0">
+                <li class="d-flex justify-content-between mb-2">
+                    {% if pedido.cupondescuento %}
+                        <del>Subtotal:</del>
+                        <del><span class="fw-semibold ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.subtotal_anterior|intcomma }}</span></del>
+                    {% else %}
+                        Subtotal: <span class="fw-semibold ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.subtotal|intcomma }}</span>
+                    {% endif %}
+                </li>
+                    {% if pedido.cupondescuento %}
+                    <li class="d-flex justify-content-between mb-2">
+                            <span>(-) Discount:  <b
+                                    class="text-warning">Coupon {{ pedido.cupondescuento.coddescuento }} ({{ pedido.porcentajeaplicado }}%)</b></span>
+                        <span class="fw-semibold ms-2 text-danger">{{ SIMBOLO_MONEDA }}{{ pedido.descuentos|intcomma }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between mb-2">
+                        Subtotal: <span
+                            class="fw-semibold ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.subtotal_anterior|intcomma }}</span>
+                    </li>
+                {% endif %}
+                {% if pedido.impuestos_ubicacion %}
+                    <li class="d-flex justify-content-between mb-2">
+                        (+) Overtravel: <span
+                            class="fw-semibold ms-2">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos_ubicacion|intcomma }}</span>
+                    </li>
+                {% endif %}
+                {% if pedido.impuestos %}
+                    <li class="d-flex justify-content-between mb-2">
+                        (+) Online Payment: <span
+                            class="fw-semibold ms-2 impuesto_">{{ SIMBOLO_MONEDA }}{{ pedido.impuestos|intcomma }}</span>
+                    </li>
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center justify-content-between border-top fs-xl pt-4">
+                Total:<span
+                    class="fs-3 fw-semibold text-dark ms-2 total_">{{ SIMBOLO_MONEDA }}{{ pedido.total|intcomma }}</span>
+            </div>
+        </div>
+    </div>
+{% endwith %}
+{% endwith %}

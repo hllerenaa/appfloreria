@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load l10n %}
+{% block atras %}{{ request.path }}{% endblock %}
+{% block content %}
+    <div class="panel panel-inverse" data-sortable-id="form-stuff-2">
+
+        <div class="panel-heading ui-sortable-handle">
+            <h4 class="panel-title">Order Detail # {{ compra.pk }}</h4>
+            <div class="panel-heading-btn">
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i
+                        class="fa fa-expand"></i></a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class='row'>
+                <div class="col-lg-6">
+                    <section class="bg-light">
+                        <div class="invoice border">
+                            <div class="invoice-header">
+                                <div class="invoice-from">
+                                    <small>Customer</small>
+                                    <address class="m-t-5 m-b-5">
+                                        <strong class="text-inverse">{{ compra.user.get_full_name }}</strong><br/>
+                                        <div class="row">
+                                            <div class="col-auto pr-0"><i class="far fa-id-card mr-1"></i></div>
+                                            <div class="col p-0">{{ compra.user.documento|default:'Sin especificar'|upper }}</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-auto pr-0"><i class="fas fa-map-marked-alt mr-1"></i></div>
+                                            <div class="col p-0">{{ compra.user.ciudad }}, {{ compra.user.ciudad.provincia }}</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-auto pr-0"><i class="fas fa-phone-alt mr-1"></i></div>
+                                            <div class="col p-0">{{ compra.user.telefono|default:'' }}</div>
+                                        </div>
+                                    </address>
+                                    <small>Pilot</small>
+                                    <address class="m-t-5 m-b-5">
+                                        <strong class="text-inverse">
+                                            {{ compra.pilot_turn.pilot.username }} - {{ compra.pilot_turn.pilot }}
+                                        </strong><br/>
+                                        <i class="fa-regular fa-clock"></i> {{ detalle.minutos_calculados }} H<br>
+                                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ compra.pilot_turn.latitud|unlocalize }},{{ compra.pilot_turn.longitud|unlocalize }}"><i class="fa-solid fa-map-location-dot"></i> View in GMaps</a><br>
+                                        <i class="fas fa-phone-alt"></i> {{ compra.pilot_turn.telefono }}
+                                    </address>
+                                </div>
+                                <div class="invoice-date">
+                                    <small>Purchase #{{ compra.pk }}</small>
+                                    <div class="date text-inverse m-t-5">{{ compra.fecha_registro|date:'E d, Y' }}</div>
+                                    <div class="invoice-detail">
+                                        <div>Payment method:</div>
+                                        <div>{{ compra.get_icon }}
+                                            <strong>{{ compra.get_metodo_pago_display }}</strong></div>
+                                    </div>
+                                    <div class="invoice-detail">
+                                        <div>Comprobante:</div>
+                                        {% if compra.metodo_pago == "TRANSFERENCIA_BANCARIA" %}
+                                            <div>
+                                                {% with urlarchivo='https://docs.google.com/gview?url='|add:URL_GENERAL|add:compra.archivo_pago.url|add:'&embedded=true' %}
+                                                    <a {% if compra.archivo_pago %}
+                                    data-fancybox
+                                    data-type="iframe"
+                                   href="{{ compra.archivo_pago.url }}" {% endif %} class="btn btn-primary btn-mini">
+                                                        <i class="far fa-window-restore"></i> View Voucher
+                                                    </a>
+                                                {% endwith %}
+                                                or
+                                                <a class="btn btn-danger btn-mini"
+                                                   href="{{ compra.archivo_pago.url }}" target="_blank">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            <div><strong>{{ compra.comprobante|default_if_none:"" }}</strong></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="invoice-detail">
+                                        {{ compra.estado_pedido }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="invoice-content">
+                                <div class="table-responsive d-none d-md-block d-lg-none d-none d-lg-block d-xl-none d-none d-xl-block">
+                                    <table class="table table-invoice">
+                                        <thead>
+                                        <tr>
+                                            <th>DESCRIPTION</th>
+                                            <th class="text-center" width="10%">PRICE</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for l in detallepedido %}
+                                            <tr>
+                                                <td>
+                                                    <span class="text-inverse">{{ l.item.nombre }}</span>
+                                                </td>
+                                                <td style="vertical-align : middle" class="text-center">
+                                                    {{ SIMBOLO_MONEDA }}{{ l.precio|intcomma }}
+                                                </td>
+                                            </tr>
+                                            {% for d in l.detalle %}
+                                                <tr>
+                                                    <td>
+                                                        <span class="text-inverse">{{ d.items_adicionales.nombre }}</span>
+                                                    </td>
+                                                    <td style="vertical-align : middle" class="text-center">
+                                                        {{ SIMBOLO_MONEDA }}{{ d.total|intcomma }}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-block d-sm-none d-none d-sm-block d-md-none">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>DETAIL</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for l in detallepedido %}
+                                            <tr>
+                                                <td>
+                                                    <div class="mb-2">
+                                                        <div class="text-break">
+                                                            {{ l.item.nombre }}
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <strong class="product-quantity">
+                                                                {{ l.cantidad }} ×
+                                                                {{ SIMBOLO_MONEDA }}{{ l.precio|intcomma }}
+                                                            </strong>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <strong class="product-quantity">
+                                                                Total: {{ SIMBOLO_MONEDA }}{{ l.total|intcomma }}
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% for d in l.detalle %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="mb-2">
+                                                            <div class="text-break">
+                                                                {{ d.items_adicionales.nombre }}
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <strong class="product-quantity">
+                                                                    Total: {{ SIMBOLO_MONEDA }}{{ d.total|intcomma }}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="invoice-price">
+                                    <div class="invoice-price-left">
+                                        <div class="invoice-price-row">
+                                            <div class="sub-price">
+                                                <small>SUBTOTAL</small>
+                                                <span class="text-inverse">{{ SIMBOLO_MONEDA }}{{ compra.subtotal|intcomma }}</span>
+                                            </div>
+                                            {% if compra.impuestos_ubicacion > 0 %}
+                                                <div class="sub-price">
+                                                    <i class="fa fa-plus text-muted"></i>
+                                                </div>
+                                                <div class="sub-price">
+                                                    <small>
+                                                        Tax for distance
+                                                    </small>
+                                                    <span class="text-inverse">{{ SIMBOLO_MONEDA }}{{ compra.impuestos_ubicacion|intcomma }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if compra.impuestos > 0 %}
+                                                <div class="sub-price">
+                                                    <i class="fa fa-plus text-muted"></i>
+                                                </div>
+                                                <div class="sub-price">
+                                                    <small>
+                                                        {{ compra.get_metodo_pago_display }} Taxes
+                                                    </small>
+                                                    <span class="text-inverse">{{ SIMBOLO_MONEDA }}{{ compra.impuestos|intcomma }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="invoice-price-right">
+                                        <small>TOTAL</small> <span
+                                            class="f-w-600">{{ SIMBOLO_MONEDA }}{{ compra.total|intcomma }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-6">
+                    <span>
+                        <h3><i class="fa-solid fa-money-bill-transfer"></i> Order</h3>
+                    </span>
+                    <hr>
+                    <form class="mt-2" method="post" action="{{ ruta }}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="pk" value="{{ pk }}"/>
+                        <input type="hidden" name="action" value="{{ action }}"/>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label" for="id_detalle">Observation</label>
+                                    <div>
+                                <textarea required rows="4"
+                                          placeholder="Ground for cancellation"
+                                          class="form-control" id="id_detalle" name="detalle"></textarea>
+                                        <div class="invalid-feedback" id="errorMessagedetalle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <div class="form-group">
+                                    <a href="{{ request.path }}" class="btn btn-danger">
+                                        <i class="fas fa-times"></i>&nbsp;Go to list
+                                    </a>
+                                    <button type="submit" id="submit" class="btn btn-success">
+                                        <i class="fas fa-times-circle"></i>&nbsp;Cancel Order
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jscript %}
+    <script src="/static/js/forms.js?v=11"></script>
+{% endblock %}
