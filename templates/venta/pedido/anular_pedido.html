@@ -36,15 +36,15 @@
                                             <div class="col p-0">{{ compra.user.telefono|default:'' }}</div>
                                         </div>
                                     </address>
-                                    <small>Pilot</small>
-                                    <address class="m-t-5 m-b-5">
-                                        <strong class="text-inverse">
-                                            {{ compra.pilot_turn.pilot.username }} - {{ compra.pilot_turn.pilot }}
-                                        </strong><br/>
-                                        <i class="fa-regular fa-clock"></i> {{ detalle.minutos_calculados }} H<br>
-                                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ compra.pilot_turn.latitud|unlocalize }},{{ compra.pilot_turn.longitud|unlocalize }}"><i class="fa-solid fa-map-location-dot"></i> View in GMaps</a><br>
-                                        <i class="fas fa-phone-alt"></i> {{ compra.pilot_turn.telefono }}
-                                    </address>
+                            <small>Detalle Ubicación de Entrega</small>
+                            <address class="m-t-5 m-b-5">
+                                <strong class="text-inverse">
+                                    {{ compra.direccion }}
+                                </strong><br/>
+                                <i class="fa-regular fa-calendar"></i> F. Entrega: {{ compra.festimada }}<br>
+                                <i class="fa-regular fa-clock"></i> {{ detalle.tiempo_de_viaje_str }} Tiempo estimado de entrega<br>
+                                <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ compra.latitud|unlocalize }},{{ compra.longitud|unlocalize }}"><i class="fa-solid fa-map-location-dot"></i> Ver GMaps</a><br>
+                            </address>
                                 </div>
                                 <div class="invoice-date">
                                     <small>Comprobante #{{ compra.pk }}</small>
@@ -215,10 +215,10 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="form-label" for="id_detalle">Observation</label>
+                                    <label class="form-label" for="id_detalle">Observación</label>
                                     <div>
                                 <textarea required rows="4"
-                                          placeholder="Ground for cancellation"
+                                          placeholder="Detalle"
                                           class="form-control" id="id_detalle" name="detalle"></textarea>
                                         <div class="invalid-feedback" id="errorMessagedetalle"></div>
                                     </div>
@@ -229,10 +229,10 @@
                             <div class="col-md-12 text-right">
                                 <div class="form-group">
                                     <a href="{{ request.path }}" class="btn btn-danger">
-                                        <i class="fas fa-times"></i>&nbsp;Go to list
+                                        <i class="fas fa-times"></i>&nbsp;Regresar
                                     </a>
                                     <button type="submit" id="submit" class="btn btn-success">
-                                        <i class="fas fa-times-circle"></i>&nbsp;Cancel Order
+                                        <i class="fas fa-times-circle"></i>&nbsp;Continar  con Cancelación
                                     </button>
                                 </div>
                             </div>

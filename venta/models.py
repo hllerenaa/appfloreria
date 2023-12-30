@@ -18,11 +18,23 @@ ESTADO_PEDIDO = (
     ("ANULADO", "Anulado"),
     ("COMPLETADO", "Completado"),
     ("DEVUELTO", "Devuelto",),
-    ("ERROR_METODO_PAGO", "Error en el médoto de pago")
+    ("ERROR_METODO_PAGO", "Error en el médoto de pago"),
 )
 
 ESTADO_ENTREGA_ = (
     ("PENDIENTE", "Pendiente de envio"),
+    ("ENVIADO", "En camino al cliente"),
+    ("ENTREGADO", "Entregado a cliente"),
+    ("DEVUELTO", "Devuelto al local",),
+)
+
+ESTADOS_PEDIDO_HISTORIAL = (
+    ("GUARDADO", "Guardado (Se registró pero aún no realiza el pago)"),
+    ("EN_ESPERA", "En espera de aprobación"),
+    ("ANULADO", "Anulado"),
+    ("COMPLETADO", "Completado"),
+    ("DEVUELTO", "Devuelto",),
+    ("ERROR_METODO_PAGO", "Error en el médoto de pago"),
     ("ENVIADO", "En camino al cliente"),
     ("ENTREGADO", "Entregado a cliente"),
     ("DEVUELTO", "Devuelto al local",),
@@ -33,6 +45,31 @@ METODO_PAGOS = (
     ("PAYPAL", "Paypal"),
     ("TRANSFERENCIA_BANCARIA", "Transferencia Bancaria")
 )
+
+
+def _estado_pedido_historial(self):
+    s = ""
+    if self.estado == "GUARDADO":
+        s = '<i class="text-secondary fas fa-ellipsis-h"></i> Pendiente'
+    elif self.estado == "EN_ESPERA":
+        s = '<i class="text-warning far fa-clock"></i> Pendiente de aprobación'
+    elif self.estado == "ANULADO":
+        s = '<i class="text-danger fas fa-times-circle"></i> Anulado'
+    elif self.estado == "DEVUELTO":
+        s = '<i class="text-danger fas fa-times-circle"></i> Devuelto'
+    elif self.estado == "COMPLETADO":
+        s = '{} Completado'.format('<i class="text-success fas fa-check-circle"></i>')
+    elif self.estado == "ERROR_METODO_PAGO":
+        s = '{} Error en el pago'.format('<i class="text-danger fas fa-times-circle"></i>')
+    elif self.estado_entrega == "PENDIENTE":
+        s = '<i class="text-secondary fas fa-ellipsis-h"></i> Pendiente de envio'
+    elif self.estado_entrega == "ENVIADO":
+        s = '<i class="text-warning far fa-clock"></i> En camino al cliente'
+    elif self.estado_entrega == "DEVUELTO":
+        s = '<i class="text-danger fas fa-times-circle"></i> Devuelto al local'
+    elif self.estado_entrega == "COMPLETADO":
+        s = '<i class="text-success fas fa-check-circle"></i> Entregado a cliente'
+    return mark_safe(s)
 
 
 def _estado_pedido(self):
@@ -49,6 +86,19 @@ def _estado_pedido(self):
         s = '{} Completado'.format('<i class="text-success fas fa-check-circle"></i>')
     elif self.estado == "ERROR_METODO_PAGO":
         s = '{} Error en el pago'.format('<i class="text-danger fas fa-times-circle"></i>')
+    return mark_safe(s)
+
+
+def _estado_entrega(self):
+    s = ""
+    if self.estado_entrega == "PENDIENTE":
+        s = '<i class="text-secondary fas fa-ellipsis-h"></i> Pendiente de envio'
+    elif self.estado_entrega == "ENVIADO":
+        s = '<i class="text-warning far fa-clock"></i> En camino al cliente'
+    elif self.estado_entrega == "DEVUELTO":
+        s = '<i class="text-danger fas fa-times-circle"></i> Devuelto al local'
+    elif self.estado_entrega == "ENTREGADO":
+        s = '<i class="text-success fas fa-check-circle"></i> Entregado a cliente'
     return mark_safe(s)
 
 
@@ -95,6 +145,10 @@ class Pedido(ModeloBase):
     modo_pago = models.BooleanField("Ejecución de Paypal", choices=TIPO_ENTORNO, default=1)
     # DATOS DE ENVIO
     estado_entrega = models.CharField("Acción de Envio", default='PENDIENTE', choices=ESTADO_ENTREGA_, max_length=100)
+    couriers = models.ForeignKey("mantenimiento.Couriers", verbose_name="Couriers", on_delete=models.PROTECT, blank=True, null=True)
+    fecha_entrega = models.DateField(verbose_name="Fecha de Entrega", blank=True, null=True)
+    detalle_entrega = models.TextField("Detalle", blank=True, null=True)
+    archivo_entrega = models.FileField(upload_to=UserUploadToPath("pedido/entrega/"), validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'tiff', "jfif", "pdf"]), validate_file_size_20mb], null=True, blank=True)
 
     @property
     def direccion(self):
@@ -144,6 +198,9 @@ class Pedido(ModeloBase):
 
     def estado_pedido(self):
         return _estado_pedido(self)
+
+    def estado_entrega_(self):
+        return _estado_entrega(self)
 
     def lista_histial(self):
         return HistorialPedido.objects.filter(status=True, pedido__id=self.pk).order_by('-id')
@@ -370,7 +427,7 @@ class HistorialPedido(ModeloBase):
     archivo = models.FileField(upload_to=UserUploadToPath("historialpedidos/archivos/"),
                                validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'tiff', "jfif", "pdf"]),
                                            validate_file_size_20mb], null=True, blank=True)
-    estado = models.CharField("Acción", choices=ESTADO_PEDIDO, max_length=100)
+    estado = models.CharField("Acción", choices=ESTADOS_PEDIDO_HISTORIAL, max_length=100)
 
     def typefile(self):
         if self.archivo:
@@ -379,18 +436,10 @@ class HistorialPedido(ModeloBase):
     def __str__(self):
         return "{} - {}".format(self.get_estado_display(), self.user.username)
 
-    def estado_pedido(self):
-        return _estado_pedido(self)
-
-    def es_estudiante(self):
-        return self.pedido.user.id == self.user.id
+    def estado_pedido_historial(self):
+        return _estado_pedido_historial(self)
 
     class Meta:
         ordering = ('-pk',)
         verbose_name = 'Historial de pedido'
         verbose_name_plural = 'Historial de pedidos'
-        constraints = [
-            models.CheckConstraint(check=Q(
-                estado__in=list(x[0] for x in ESTADO_PEDIDO)),
-                name='historialpedido__estado__in__ESTADO_PEDIDO'),
-        ]

@@ -21,6 +21,8 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from core.metodos_de_pago import reversar_pago_payphone, reversar_pago_paypal
+from mantenimiento.forms import CouriersForm
+from .forms import PedidoForm, PedidoEnvioForm
 from .models import Pedido, PedidoDetalle, ESTADO_PEDIDO, METODO_PAGOS, HistorialPedido
 import os
 
@@ -166,7 +168,31 @@ def pedidoView(request):
                                              })
                     else:
                         res_json.append({"error": True, "message": "No tienes permisos para esta acción"})
-
+                elif action == 'addcouriers':
+                    filtro = Pedido.objects.get(pk=int(request.POST['pk']))
+                    form = PedidoForm(request.POST, request.FILES, instance=filtro)
+                    if form.is_valid():
+                        form.instance.estado_entrega = 'ENVIADO'
+                        form.save()
+                        ht = HistorialPedido.objects.create(pedido_id=filtro.pk,
+                                                            detalle=f"Enviado al cliente con {form.cleaned_data['couriers']}",
+                                                            estado="ENVIADO", user_id=request.user.pk,
+                                                            archivo=request.FILES.get('archivo_entrega'))
+                        res_json.append({'error': False, "reload": True})
+                    else:
+                        raise FormError(form)
+                elif action == 'changeestadoenvio':
+                    filtro = Pedido.objects.get(pk=int(request.POST['pk']))
+                    form = PedidoEnvioForm(request.POST, request.FILES, instance=filtro)
+                    if form.is_valid():
+                        form.save()
+                        ht = HistorialPedido.objects.create(pedido_id=filtro.pk,
+                                                            detalle=f"Pedido fue {form.cleaned_data['estado_entrega']}",
+                                                            estado=form.cleaned_data['estado_entrega'], user_id=request.user.pk,
+                                                            archivo=request.FILES.get('archivo_entrega'))
+                        res_json.append({'error': False, "reload": True})
+                    else:
+                        raise FormError(form)
         except Exception as ex:
             res_json.append({'error': True,
                              "message": f"Intente Nuevamente, {ex}"
@@ -225,6 +251,26 @@ def pedidoView(request):
                 else:
                     messages.success(request, f"Acción no permitida")
                     return redirect('/')
+            elif action == 'addcouriers':
+                try:
+                    data['id'] = id = int(request.GET['pk'])
+                    data['filtro'] = filtro = Pedido.objects.get(pk=id)
+                    form = PedidoForm()
+                    data['form'] = form
+                    template = get_template("venta/pedido/formmodal.html")
+                    return JsonResponse({"result": True, 'data': template.render(data), 'titulo': 'Asignar Courier #{} - {}'.format(id, filtro.user.get_full_name())})
+                except Exception as ex:
+                    pass
+            elif action == 'changeestadoenvio':
+                try:
+                    data['id'] = id = int(request.GET['pk'])
+                    data['filtro'] = filtro = Pedido.objects.get(pk=id)
+                    form = PedidoEnvioForm()
+                    data['form'] = form
+                    template = get_template("venta/pedido/formmodal.html")
+                    return JsonResponse({"result": True, 'data': template.render(data), 'titulo': 'Cambiar Estado de Entrega #{} - {}'.format(id, filtro.user.get_full_name())})
+                except Exception as ex:
+                    pass
         if can_view:
             id, criterio, fecha_desde, fecha_hasta, filtros, url_vars = request.GET.get('id', ''),  request.GET.get('criterio', '').strip(), request.GET.get('fecha_desde', ''),request.GET.get('fecha_hasta', ''), (Q(status=True) ), ''
             metodopago, estado = request.GET.get('metodopago', '').strip(), request.GET.get('estado', '').strip()

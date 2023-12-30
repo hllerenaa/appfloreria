@@ -36,14 +36,17 @@
                                             <div class="col p-0">{{ compra.user.telefono|default:'' }}</div>
                                         </div>
                                     </address>
-                                    <small>Pilot</small>
+                                    <small>Detalle Ubicación de Entrega</small>
                                     <address class="m-t-5 m-b-5">
                                         <strong class="text-inverse">
-                                            {{ compra.pilot_turn.pilot.username }} - {{ compra.pilot_turn.pilot }}
+                                            {{ compra.direccion }}
                                         </strong><br/>
-                                        <i class="fa-regular fa-clock"></i> {{ detalle.minutos_calculados }} H<br>
-                                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ compra.pilot_turn.latitud|unlocalize }},{{ compra.pilot_turn.longitud|unlocalize }}"><i class="fa-solid fa-map-location-dot"></i> View in GMaps</a><br>
-                                        <i class="fas fa-phone-alt"></i> {{ compra.pilot_turn.telefono }}
+                                        <i class="fa-regular fa-calendar"></i> F. Entrega: {{ compra.festimada }}<br>
+                                        <i class="fa-regular fa-clock"></i> {{ detalle.tiempo_de_viaje_str }} Tiempo
+                                        estimado de entrega<br>
+                                        <a target="_blank"
+                                           href="https://www.google.com/maps/search/?api=1&query={{ compra.latitud|unlocalize }},{{ compra.longitud|unlocalize }}"><i
+                                                class="fa-solid fa-map-location-dot"></i> Ver GMaps</a><br>
                                     </address>
                                 </div>
                                 <div class="invoice-date">
@@ -62,7 +65,8 @@
                                                     <a {% if compra.archivo_pago_is_image %}data-fancybox="image"
                                                        href="{{ compra.archivo_pago.url }}" {% else %} data-fancybox
                                                        data-type="iframe"
-                                                       href="{{ compra.archivo_pago.url }}" {% endif %} class="btn btn-primary btn-mini">
+                                                       href="{{ compra.archivo_pago.url }}" {% endif %}
+                                                       class="btn btn-primary btn-mini">
                                                         <i class="far fa-window-restore"></i> See Voucher
                                                     </a>
                                                 {% endwith %}
@@ -206,7 +210,7 @@
                 <div class="col-lg-6">
 
                     <span>
-                        <h3><i class="fa-solid fa-money-bill-transfer"></i> Reverse payment</h3>
+                        <h3><i class="fa-solid fa-money-bill-transfer"></i> Reversar Pago</h3>
                     </span>
                     <hr>
                     <form class="mt-2" method="post" action="{{ ruta }}" enctype="multipart/form-data">
@@ -216,14 +220,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="alert alert-danger" role="alert">
-                                    <b><i class="fa fa-info-circle"></i> You are about to reverse the payment to the customer</b>,
-                                    You will not be able to cancel the transaction.
-                                    <br>After this operation the money charged for this operation will be
-                                    returned to customer.
+                                    <b><i class="fa fa-info-circle"></i> Está a punto de revertir el pago al
+                                         cliente</b>,
+                                     No podrás cancelar la transacción.
+                                     <br>Después de esta operación el dinero cobrado por esta operación será
+                                     devuelto al cliente.
 
                                 </div>
-                                <label><b>Reason:</b></label>
-                                <textarea class="form-control" name="razon_reverso" placeholder="Reverse ratio"
+                                <label><b>Razón:</b></label>
+                                <textarea class="form-control" name="razon_reverso" placeholder="Observación"
                                           required></textarea>
                             </div>
                         </div>
@@ -232,10 +237,10 @@
                             <div class="col-md-12 text-right">
                                 <div class="form-group">
                                     <a href="{{ request.path }}" class="btn btn-danger">
-                                        <i class="fas fa-times"></i>&nbsp;Cancel
+                                        <i class="fas fa-times"></i>&nbsp;Cancelar
                                     </a>
                                     <button type="submit" id="submit" class="btn btn-success">
-                                        <i class="fa-solid fa-money-bill-transfer"></i>&nbsp;Reverse payment
+                                        <i class="fa-solid fa-money-bill-transfer"></i>&nbsp;Reversar Pago
                                     </button>
                                 </div>
                             </div>

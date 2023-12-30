@@ -6,6 +6,20 @@ from django.core.exceptions import ValidationError
 from mantenimiento.models import *
 
 
+class CouriersForm(ModelFormBase):
+    class Meta:
+        model = Couriers
+        exclude = ('usuario_creacion', 'fecha_registro', 'hora_registro', 'status')
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        if self.editando and Couriers.objects.filter(status=True, nombre__iexact=nombre).exclude(id=self.instance.id).exists():
+            raise ValidationError("Ya existe un Couriers con este nombre")
+        elif not self.editando and Couriers.objects.filter(status=True, nombre__iexact=nombre).exists():
+            raise ValidationError("Ya existe un Couriers con este nombre")
+        return nombre
+
+
 class CarouselForm(ModelFormBase):
     class Meta:
         model = Carousel

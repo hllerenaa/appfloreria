@@ -96,7 +96,12 @@ def pagoView(request, pedido_id):
             subject = f'¡Acabas de recibir un nuevo pago por el producto. {producto}!'
             to = data['confi'].email
             send_html_mail(subject, "email/interesado_curso.html", datos, [to], [], [])
-
+            if 'carrito' in request.session:
+                del request.session['carrito']
+            if 'dict_orden' in request.session:
+                del request.session['dict_orden']
+            if 'total' in request.session:
+                del request.session['total']
             res_json.append(
                 {
                     "to": "/orders/",

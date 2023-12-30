@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load l10n %}
 {% load humanize %}
 {% load templatefunctions %}
 {% block content %}
@@ -59,9 +60,12 @@
 
         <div class="panel-body">
             <label class="label label-primary" style="font-size: 13px">Cant. {{ list_count }}</label>
-            <label class="label label-warning tr" title="Total Recaudado" style="font-size: 13px">Total. ${{ totalrecaudado }}</label>
-            <label class="label label-danger tr" title="Total Devuelto" style="font-size: 13px">Total. ${{ totalreversado }}</label>
-            <label class="label label-success tr" title="Total Valido" style="font-size: 13px">Total. ${{ totalvalido }}</label>
+            <label class="label label-warning tr" title="Total Recaudado" style="font-size: 13px">Total.
+                ${{ totalrecaudado }}</label>
+            <label class="label label-danger tr" title="Total Devuelto" style="font-size: 13px">Total.
+                ${{ totalreversado }}</label>
+            <label class="label label-success tr" title="Total Valido" style="font-size: 13px">Total.
+                ${{ totalvalido }}</label>
             <table id="tabla" class="table table-hover table-td-valign-middle table-bordered">
                 <thead>
                 <tr>
@@ -78,16 +82,10 @@
                         Comprobante
                     </th>
                     <th class="text-center">
-                        Subtotal
-                    </th>
-                    <th class="text-center">
-                        Impuestos
-                    </th>
-                    <th class="text-center">
-                        Costo de Envio
-                    </th>
-                    <th class="text-center">
                         Total
+                    </th>
+                    <th class="text-center">
+                        Detalle de Entrega
                     </th>
                     <th class="text-center">
                         Estado
@@ -145,31 +143,36 @@
                                 {{ l.comprobante|default:'---' }}
                             {% endif %}
                         </td>
-                        <td class="text-center">
-                            $ {{ l.subtotal|intcomma }}
-                        </td>
-                        <td class="text-center">
-                            $ {{ l.impuestos|intcomma }}
-                        </td>
-                        <td class="text-center">
-                            $ {{ l.impuestos_ubicacion|intcomma }}
-                        </td>
                         <td class="text-center" style="width: 10%">
                             <b>$ {{ l.total|intcomma }}</b>
                         </td>
+                        <td class="text-left">
+                            {{ l.estado_entrega_ }}<br>
+                            {% if l.couriers %}
+                                <i class="fa fa-user"></i> {{ l.couriers.nombre }} <br>
+                                <i class="fa fa-phone"></i><a href="javascript:void(0)"
+                                                              onclick="msgCurier('{{ l.couriers.telefono }}', '{{ l.couriers.nombre }}')"> {{ l.couriers.telefono }}</a>
+                                <br>
+                                <i class="fa fa-envelope"></i><strong><a
+                                    href="mailto:{{ l.couriers.email|default:'' }}"> {{ l.couriers.email|default:'' }}</a></strong>
+                                <br>
+                            {% else %}
+                                <a href="javascript:void(0)"
+                                   onclick="verModalHistorial('addcouriers', '{{ l.pk }}', 'fas fa-motorcycle', '{{ request.path }}', true)"
+                                   class="btn btn-primary btn-mini"><i
+                                        class="fa fa-motorcycle"></i> Asignar Courier</a><br>
+                            {% endif %}
+                            <i class="fa fa-map-marked"></i> {{ l.direccion }} <br>
+                            <i class="fa-regular fa-calendar"></i> F. Entrega: {{ l.festimada }}<br>
+                            <i class="fa-regular fa-clock"></i> {{ l.tiempo_de_viaje_str }} Tiempo estimado de
+                            entrega<br>
+                            <a target="_blank"
+                               href="https://www.google.com/maps/search/?api=1&query={{ l.latitud|unlocalize }},{{ l.longitud|unlocalize }}"><i
+                                    class="fa-solid fa-map-location-dot"></i> Ver GMaps</a><br>
+
+                        </td>
                         <td class="text-center">
                             {{ l.estado_pedido }}
-                            <div>
-                                {% if l.trabajo_completado %}
-                                    <a href="javascript:;"
-                                       onclick="verModalGet('ver_trabajo_completado', '{{ l.pk }}', 'fa-solid fa-plane-circle-check', 'modal-lg', '{{ request.path }}')"
-                                       class="text-success">
-                                        <b>
-                                            <i class="fa-solid fa-plane-circle-check"></i> Marked as completed
-                                        </b>
-                                    </a>
-                                {% endif %}
-                            </div>
                         </td>
                         <td class="with-btn-group text-center" nowrap>
                             <div class="btn-group dropleft">
@@ -179,14 +182,21 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
                                     {% if can_view %}
-                                        <a class="dropdown-item"
-                                           href="{{ ruta }}?pk={{ l.pk }}&action=detalle&{{ dict_url_vars }}">
-                                            <i class="fas fa-eye"></i> Detalle
-                                        </a>
+                                        {#                                        <a class="dropdown-item"#}
+                                        {#                                           href="{{ ruta }}?pk={{ l.pk }}&action=detalle&{{ dict_url_vars }}">#}
+                                        {#                                            <i class="fas fa-eye"></i> Detalle#}
+                                        {#                                        </a>#}
                                         {% if l.estado == 'EN_ESPERA' %}
-                                            <a class="dropdown-item" t
+                                            <a class="dropdown-item"
                                                href="{{ ruta }}?pk={{ l.pk }}&action=pago_pendiente&{{ dict_url_vars }}">
                                                 <i class="fas fa-check-double"></i> Validar Pago
+                                            </a>
+                                        {% endif %}
+                                        {% if not l.estado_entrega == 'ENTREGADO' %}
+                                            <a class="dropdown-item"
+                                               onclick="verModalHistorial('changeestadoenvio', '{{ l.pk }}', 'fas fa-motorcycle', '{{ request.path }}', true)"
+                                               href="javascript:;">
+                                                <i class="fas fa-vote-yea"></i> Marcar como entregado
                                             </a>
                                         {% endif %}
                                         <a onclick="verModalHistorial('historial_orden', '{{ l.pk|get_encrypt }}', 'fas fa-history')"
@@ -277,7 +287,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer footerModal">
                     <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
                             class="fa fa-window-close"></i>
                         Cerrar</a>
@@ -350,10 +360,11 @@
 {% endblock %}
 
 {% block jscript %}
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ GMAP_API_KEY }}&libraries=places"></script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key={{ GMAP_API_KEY }}&libraries=places"></script>
     <script src="/static/js/forms.js?v=11"></script>
     <script>
+
         function formModal(id, text, action, footer = false) {
             pantallaespera()
             $('#footerModalView').hide();
@@ -384,13 +395,25 @@
                 dataType: "json"
             });
         }
+
+        function msgCurier(telf, nombre) {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                let url = `https://api.whatsapp.com/send?phone=+593${telf}&text=Hola *${nombre}*`;
+                window.open(url);
+            } else {
+                let url = `https://web.whatsapp.com/send?l=en&phone=+593${telf}&text=Hola *${nombre}*`;
+                window.open(url);
+            }
+        }
+
     </script>
     <script src="/static/fancybox/js/core.js"></script>
     <script>
 
         const ModalAdd = $('#ModalAdd');
 
-        function verModalHistorial(action, id, icon, ruta = null) {
+        function verModalHistorial(action, id, icon, ruta = null, footer = false) {
+            $('.footerModal').show()
             $.ajax({
                 type: "GET",
                 url: ruta ? ruta : "{{ ruta }}",
@@ -400,6 +423,9 @@
                         $('#icono').attr('class', icon);
                         $('#accion').text(data.titulo);
                         $('.tablaaqui').html(data.data);
+                        if (footer) {
+                            $('.footerModal').hide()
+                        }
                         ModalAdd.modal({backdrop: 'static'}).modal('show');
                     } else {
                         mensajeDanger(data.mensaje);

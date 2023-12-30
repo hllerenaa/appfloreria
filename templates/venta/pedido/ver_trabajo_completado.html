@@ -23,14 +23,16 @@
                 </address>
             </div>
             <div class="invoice-to">
-                <small>Pilot</small>
+                <small>Detalle Ubicación de Entrega</small>
                 <address class="m-t-5 m-b-5">
                     <strong class="text-inverse">
-                        {{ compra.pilot_turn.pilot.username }} - {{ compra.pilot_turn.pilot }}
+                        {{ compra.direccion }}
                     </strong><br/>
-                    <i class="fa-regular fa-clock"></i> {{ detalle.minutos_calculados }} H<br>
-                    <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ compra.pilot_turn.latitud|unlocalize }},{{ compra.pilot_turn.longitud|unlocalize }}"><i class="fa-solid fa-map-location-dot"></i> View in GMaps</a><br>
-                    <i class="fas fa-phone-alt"></i> {{ compra.pilot_turn.telefono }}
+                    <i class="fa-regular fa-calendar"></i> F. Entrega: {{ compra.festimada }}<br>
+                    <i class="fa-regular fa-clock"></i> {{ detalle.tiempo_de_viaje_str }} Tiempo estimado de entrega<br>
+                    <a target="_blank"
+                       href="https://www.google.com/maps/search/?api=1&query={{ compra.latitud|unlocalize }},{{ compra.longitud|unlocalize }}"><i
+                            class="fa-solid fa-map-location-dot"></i> Ver GMaps</a><br>
                 </address>
             </div>
             <div class="invoice-date">
@@ -205,7 +207,8 @@
         <div class="col-md-12 mb-3">
             <label><b>Date:</b></label>
             <div class="border border-round p-5">
-                {{ compra.pilot_turn.date|date:'l d/M/Y' }} ({{ compra.pilot_turn.configuration.time_start }} - {{ compra.pilot_turn.configuration.time_end }})
+                {{ compra.pilot_turn.date|date:'l d/M/Y' }} ({{ compra.pilot_turn.configuration.time_start }}
+                - {{ compra.pilot_turn.configuration.time_end }})
             </div>
         </div>
         {% if fechas_adicionales %}

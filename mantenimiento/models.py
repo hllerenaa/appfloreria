@@ -122,3 +122,18 @@ class ProductoItems(ModeloBase):
     class Meta:
         verbose_name = 'Producto Items Adicional'
         verbose_name_plural = 'Producto Items Adicionales'
+
+
+class Couriers(ModeloBase):
+    agencia = models.CharField(max_length=250, verbose_name='Agencia')
+    nombre = models.CharField(max_length=250, verbose_name='Nombre')
+    telefono = models.CharField(max_length=100, verbose_name='Teléfono', validators=[solo_numeros])
+    email = models.EmailField(blank=True, null=True, verbose_name='Correo Electrónico')
+
+    def __str__(self):
+        return "{}, {}".format(self.agencia, self.nombre)
+
+    class Meta:
+        verbose_name = 'Couriers'
+        verbose_name_plural = 'Couriers'
+        ordering = ('nombre',)

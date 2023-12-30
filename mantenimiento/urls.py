@@ -1,9 +1,15 @@
 from django.urls import path, re_path, include
 from .view_carrousel import carrouselView
+from .view_curriers import couriersView
 from .view_redessociales import redessocialesView
 from .view_producto import productoView
 
 mantenimiento_urls = (
+    {
+        "nombre": "Couriers",
+        "url": 'couriers/',
+        "vista": couriersView,
+    },
     {
         "nombre": "Carrousel",
         "url": 'carousel/',
