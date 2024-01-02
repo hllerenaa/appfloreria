@@ -151,7 +151,7 @@
                             {% if l.couriers %}
                                 <i class="fa fa-user"></i> {{ l.couriers.nombre }} <br>
                                 <i class="fa fa-phone"></i><a href="javascript:void(0)"
-                                                              onclick="msgCurier('{{ l.couriers.telefono }}', '{{ l.couriers.nombre }}')"> {{ l.couriers.telefono }}</a>
+                                                              onclick="msgCurier{{ l.id }}('{{ l.couriers.telefono }}', '{{ l.couriers.nombre }}', '{{ l.latitud|unlocalize }}', '{{ l.longitud|unlocalize }}')"> {{ l.couriers.telefono }}</a>
                                 <br>
                                 <i class="fa fa-envelope"></i><strong><a
                                     href="mailto:{{ l.couriers.email|default:'' }}"> {{ l.couriers.email|default:'' }}</a></strong>
@@ -298,60 +298,60 @@
 
     {% for l in listado %}
         {% with resp_metodo_pago=l.get_resp_metodo_pago %}
-            {% if resp_metodo_pago %}
-                <div class="modal fade bd-example-modal-lg detallePagoModal"
-                     id="modalMetodoPago{{ l.id }}"
-                     tabindex="-1"
-                     role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    {{ l.get_icon }} Pago
-                                    por {{ l.get_metodo_pago_display }} of the order
-                                    #{{ l.pk }}
-                                </h5>
-                                <button type="button" class="close" data-dismiss="modal"
-                                        aria-label="Close">
+            {#            {% if resp_metodo_pago %}#}
+            <div class="modal fade bd-example-modal-lg detallePagoModal"
+                 id="modalMetodoPago{{ l.id }}"
+                 tabindex="-1"
+                 role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                {{ l.get_icon }} Pago
+                                por {{ l.get_metodo_pago_display }} of the order
+                                #{{ l.pk }}
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
                                                                     <span aria-hidden="true"><i
                                                                             class="fas fa-times"></i></span>
-                                </button>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <tbody>
+                                    {#                                        <tr>#}
+                                    {#                                            <th class="text-left">IP</th>#}
+                                    {#                                            <td class="text-left">{{ l.session_user.ip }}</td>#}
+                                    {#                                        </tr>#}
+                                    {#                                        <tr>#}
+                                    {#                                            <th class="text-left">Dispositivo</th>#}
+                                    {#                                            <td class="text-left">{{ l.session_user.dispositivo }}</td>#}
+                                    {#                                        </tr>#}
+                                    {#                                        <tr>#}
+                                    {#                                            <th class="text-left">Localidad</th>#}
+                                    {#                                            <td class="text-left">{{ l.session_user.areageografica }}</td>#}
+                                    {#                                        </tr>#}
+                                    {% for r in l.get_resp_metodo_pago %}
+                                        <tr>
+                                            <th class="text-left">{{ r.nombre }}</th>
+                                            <td class="text-left">{{ r.valor }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="modal-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
-                                        <tbody>
-                                        {#                                        <tr>#}
-                                        {#                                            <th class="text-left">IP</th>#}
-                                        {#                                            <td class="text-left">{{ l.session_user.ip }}</td>#}
-                                        {#                                        </tr>#}
-                                        {#                                        <tr>#}
-                                        {#                                            <th class="text-left">Dispositivo</th>#}
-                                        {#                                            <td class="text-left">{{ l.session_user.dispositivo }}</td>#}
-                                        {#                                        </tr>#}
-                                        {#                                        <tr>#}
-                                        {#                                            <th class="text-left">Localidad</th>#}
-                                        {#                                            <td class="text-left">{{ l.session_user.areageografica }}</td>#}
-                                        {#                                        </tr>#}
-                                        {% for r in resp_metodo_pago %}
-                                            <tr>
-                                                <th class="text-left">{{ r.nombre }}</th>
-                                                <td class="text-left">{{ r.valor }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
-                                        class="fa fa-window-close"></i>
-                                    Cerrar</a>
-                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="javascript:;" class="btn btn-white" data-dismiss="modal"><i
+                                    class="fa fa-window-close"></i>
+                                Cerrar</a>
                         </div>
                     </div>
                 </div>
-            {% endif %}
+            </div>
+            {#            {% endif %}#}
         {% endwith %}
     {% endfor %}
 
@@ -396,15 +396,24 @@
             });
         }
 
-        function msgCurier(telf, nombre) {
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                let url = `https://api.whatsapp.com/send?phone=+593${telf}&text=Hola *${nombre}*`;
-                window.open(url);
-            } else {
-                let url = `https://web.whatsapp.com/send?l=en&phone=+593${telf}&text=Hola *${nombre}*`;
-                window.open(url);
+        {% for l in listado %}
+            function msgCurier{{ l.id }}(telf, nombre, lat, long) {
+                var lista = [];
+                lista.push("*CANT* - *NOMBRE*")
+                {% for xl in l.get_detalle %}
+                    lista.push('{{ xl.cantidad|stringformat:"i" }}' + " - " + '{{ xl.item.nombre|safe }}');
+                {% endfor %}
+                var ruta = 'https://www.google.com/maps/search/' + lat.toString() + ',' + long.toString()
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    let url = `https://api.whatsapp.com/send?phone=+593${telf}&text=*CLIENTE:* {{ xl.user.get_full_name }}%0A${ruta.toString()}%0A*REFERENCIA*: {{ xl.direccion }}%0A*PEDIDO A ENTREGAR*%0A${lista.join("%0A")}`;
+                    window.open(url);
+                } else {
+                    let url = `https://web.whatsapp.com/send?l=en&phone=+593${telf}&text=*CLIENTE:* {{ xl.user.get_full_name }}%0A${ruta.toString()}%0A*REFERENCIA*: {{ xl.direccion }}%0A*PEDIDO A ENTREGAR*%0A${lista.join("%0A")}`;
+                    window.open(url);
+                }
             }
-        }
+        {% endfor %}
+
 
     </script>
     <script src="/static/fancybox/js/core.js"></script>

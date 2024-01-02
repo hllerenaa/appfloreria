@@ -149,8 +149,8 @@ def pedidoView(request):
                         if filtro and request.user.is_superuser:
                             filtro.estado = "ANULADO"
                             filtro.save()
-                            for l in filtro.get_detalle():
-                                l.retirar(request)
+                            # for l in filtro.get_detalle():
+                            #     l.retirar(request)
                             ht = HistorialPedido.objects.create(pedido_id=filtro.pk,
                                                                 detalle=request.POST['detalle'],
                                                                 estado="ANULADO", user_id=request.user.pk,
