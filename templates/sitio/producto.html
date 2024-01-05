@@ -131,27 +131,48 @@
 {% block jscript %}
     <script>
         document.getElementById('finalize-order-btn').addEventListener('click', function () {
-            let additionalItemsSelected = document.querySelectorAll('.additional-item-checkbox:checked').length;
-            let productoItemsExist = '{{ producto.listitems|length }}' > 0;
-            if (productoItemsExist && additionalItemsSelected === 0) {
+            {% if not reques.user.is_authenticated %}
                 Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "No has seleccionado ninguna opción adicional para tu pedido.",
+                    title: 'Estimado Cliente',
+                    text: "para adicionar productos al carrito primero debes iniciar sesión.",
                     type: 'warning',
                     showCancelButton: true,
                     allowOutsideClick: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, agregar al carrito',
-                    cancelButtonText: 'Volver y seleccionar'
+                    confirmButtonText: 'Ok, Iniciar Sesión',
+                    cancelButtonText: 'No tengo cuenta, Registrarme'
                 }).then((result) => {
                     if (result.value) {
-                        addToCart();
+                        location = "/login/";
+                    } else {
+
+                        location = "/register/";
                     }
                 })
-            } else {
-                addToCart();
-            }
+            {% else %}
+                let additionalItemsSelected = document.querySelectorAll('.additional-item-checkbox:checked').length;
+                let productoItemsExist = '{{ producto.listitems|length }}' > 0;
+                if (productoItemsExist && additionalItemsSelected === 0) {
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "No has seleccionado ninguna opción adicional para tu pedido.",
+                        type: 'warning',
+                        showCancelButton: true,
+                        allowOutsideClick: false,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, agregar al carrito',
+                        cancelButtonText: 'Volver y seleccionar'
+                    }).then((result) => {
+                        if (result.value) {
+                            addToCart();
+                        }
+                    })
+                } else {
+                    addToCart();
+                }
+            {% endif %}
         });
 
 
