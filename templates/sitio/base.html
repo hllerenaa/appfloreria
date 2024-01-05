@@ -189,17 +189,21 @@
                                                 <div class="cart-text-btn">
                                                     <div class="cart-qty">
                                                         <span>{{ producto.cantidad }}×</span>
-                                                        <span class="cart-price">${{ producto.subtotal }}</span>
+                                                        {% if request.user.is_authenticated %}
+                                                            <span class="cart-price">${{ producto.precio }} </span>
+                                                        {% endif %}
                                                     </div>
                                                     <span>Adicionales {{ producto.adicionales|length }}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    <div class="cart-price-total d-flex justify-content-between">
-                                        <h5>Total :</h5>
-                                        <h5>${{ request.session.total }}</h5>
-                                    </div>
+                                    {% if request.user.is_authenticated %}
+                                        <div class="cart-price-total d-flex justify-content-between">
+                                            <h5>Total :</h5>
+                                            <h5>${{ request.session.total }}</h5>
+                                        </div>
+                                    {% endif %}
                                     <div class="cart-links d-flex justify-content-between">
                                         <a style="width: 100%" class="btn product-cart button-icon flosun-button dark-btn btn-block" href="/carrito">Ver
                                             Carrito</a>

@@ -96,7 +96,9 @@
                                                 {% endif %}
                                                 <div class="card-body">
                                                     <h5 class="card-title">{{ item.nombre }}</h5>
-                                                    <p class="card-text">${{ item.precio }}</p>
+                                                    {% if request.user.is_authenticated %}
+                                                        <p class="card-text">${{ item.precio }}</p>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="card-footer" style="background: white;">
                                                     <div class="form-check">
