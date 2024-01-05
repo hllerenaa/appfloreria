@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/static/sitio/assets/css/plugins/nice-select.min.css">
     <link rel="stylesheet" href="/static/sitio/assets/css/plugins/magnific-popup.css">
     <link rel="stylesheet" href="/static/sitio/assets/css/style.css">
+    <link href="{{ favicon }}" rel="shortcut icon"/>
     <style>
         .btn {
             display: inline-block;
@@ -180,7 +181,7 @@
                                     {% for producto in request.session.carrito %}
                                         <div class="single-cart-item">
                                             <div class="cart-img">
-                                                <a href="/carrito"><img src="/static/sitio/assets/images/cart/1.jpg"
+                                                <a href="/carrito"><img src="/media/{{ producto.foto }}"
                                                                          alt=""></a>
                                             </div>
                                             <div class="cart-text">

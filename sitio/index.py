@@ -41,5 +41,5 @@ def index(request):
                 VisitaEntorno.objects.create(fecha_visita=datetime.now().date(), ip=ipresult, hora_visita=datetime.now().time(), user_id=request.user.pk,
                                              dispositivo=dispositivo)
         data['listcarousel'] = listcarousel = Carousel.objects.filter(status=True, publicado=True).order_by('orden')
-        data['listproductos'] = listproductos = Producto.objects.filter(status=True, activo=True).order_by('?')[:10]
+        data['listproductos'] = listproductos = Producto.objects.filter(status=True, activo=True).order_by('?')[:9]
         return render(request, 'sitio/landing.html', data)
