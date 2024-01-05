@@ -135,13 +135,11 @@
         document.getElementById('finalize-order-btn').addEventListener('click', function () {
             {% if not reques.user.is_authenticated %}
                 Swal.fire({
-                    title: 'Estimado Cliente',
+                    title: 'Estimado(a) Cliente',
                     text: "para adicionar productos al carrito primero debes iniciar sesión.",
                     type: 'warning',
                     showCancelButton: true,
                     allowOutsideClick: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Ok, Iniciar Sesión',
                     cancelButtonText: 'No tengo cuenta, Registrarme'
                 }).then((result) => {
