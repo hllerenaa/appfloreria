@@ -169,7 +169,8 @@
                         </ul>
                     </nav>
                 </div>
-                <div class="col-lg-2 col-md-6 col-6 col-custom">
+                {% if request.user.is_authenticated %}
+                    <div class="col-lg-2 col-md-6 col-6 col-custom">
                     <div class="header-right-area main-nav">
                         <ul class="nav">
                             <li class="minicart-wrap">
@@ -189,21 +190,17 @@
                                                 <div class="cart-text-btn">
                                                     <div class="cart-qty">
                                                         <span>{{ producto.cantidad }}×</span>
-                                                        {% if request.user.is_authenticated %}
-                                                            <span class="cart-price">${{ producto.precio }} </span>
-                                                        {% endif %}
+                                                        <span class="cart-price">${{ producto.precio }} </span>
                                                     </div>
                                                     <span>Adicionales {{ producto.adicionales|length }}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                    {% endfor %}
-                                    {% if request.user.is_authenticated %}
-                                        <div class="cart-price-total d-flex justify-content-between">
-                                            <h5>Total :</h5>
-                                            <h5>${{ request.session.total }}</h5>
-                                        </div>
-                                    {% endif %}
+                                    {% endfor %}+
+                                    <div class="cart-price-total d-flex justify-content-between">
+                                        <h5>Total :</h5>
+                                        <h5>${{ request.session.total }}</h5>
+                                    </div>+
                                     <div class="cart-links d-flex justify-content-between">
                                         <a style="width: 100%" class="btn product-cart button-icon flosun-button dark-btn btn-block" href="/carrito">Ver
                                             Carrito</a>
@@ -218,6 +215,7 @@
                         </ul>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

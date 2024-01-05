@@ -100,7 +100,8 @@
                                                         <p class="card-text">${{ item.precio }}</p>
                                                     {% endif %}
                                                 </div>
-                                                <div class="card-footer" style="background: white;">
+                                                {% if request.user.is_authenticated %}
+                                                    <div class="card-footer" style="background: white;">
                                                     <div class="form-check">
                                                         <input class="form-check-input additional-item-checkbox"
                                                                type="checkbox" value="{{ item.id }}"
@@ -111,6 +112,7 @@
                                                         </label>
                                                     </div>
                                                 </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     {% endif %}
