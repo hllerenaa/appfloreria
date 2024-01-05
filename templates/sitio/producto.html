@@ -133,7 +133,7 @@
 {% block jscript %}
     <script>
         document.getElementById('finalize-order-btn').addEventListener('click', function () {
-            {% if not reques.user.is_authenticated %}
+            {% if not request.user.is_authenticated %}
                 Swal.fire({
                     title: 'Estimado(a) Cliente',
                     text: "para adicionar productos al carrito primero debes iniciar sesión.",
