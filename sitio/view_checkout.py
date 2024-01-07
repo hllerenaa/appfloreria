@@ -136,7 +136,7 @@ def checkoutView(request):
         data['dateatt'] = dateatt = str(orden['dateatt'])
         limite_envio = data['confi'].limite_km_envio
         precio_km_pasado = data['confi'].precio_km_pasado
-        precio_impuesto_ubicacion = 0
+        precio_impuesto_ubicacion = Decimal(data['confi'].precio_envio)
         km_adicionales = 0
         if Decimal(str(kms)) > limite_envio:
             km_adicionales = Decimal(kms - limite_envio)

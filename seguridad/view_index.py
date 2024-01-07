@@ -12,6 +12,7 @@ from autenticacion.models import PerfilCliente
 from core.funciones import addData, secure_module
 from sitio.models import VisitaEntorno
 from seguridad.models import *
+from venta.models import Pedido
 
 
 @login_required
@@ -58,5 +59,11 @@ def index(request):
         if maxvisitasday <= 5:
             maxvisitasday = 10
         data['maxvisitaday'] = maxvisitasday
+
+        recaudado = Pedido.objects.values('total').filter(status=True, estado__in=["COMPLETADO"], fecha_registro__month=datetime.now().month, fecha_registro__year=datetime.now().year)
+        pendiente = Pedido.objects.values('total').filter(status=True, estado="EN_ESPERA")
+        data['totalRecaudados'] = recaudado.aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
+        data['totalRecaudar'] = pendiente.aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
+        data['pedidopendientelist'] = pedidopendientelist = Pedido.objects.values('id').filter(status=True, estado='EN_ESPERA').count()
 
         return render(request, 'seguridad/index.html', data)
