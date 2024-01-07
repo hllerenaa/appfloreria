@@ -86,4 +86,35 @@
     {{ form.media }}
     <script src="/static/validaciones/funciones.js?v=2.2"></script>
     <script src="/static/assets/plugins/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+    <link href="/static/assets/plugins/jstree/dist/themes/default/style.min.css" rel="stylesheet"/>
+    <script src="/static/assets/plugins/jstree/dist/jstree.min.js"></script>
+    <script src="/static/validaciones/funciones.js?v=2.2"></script>
+    <script src="/static/js/lista-icons-fontawesome.js?version=2"></script>
+    <script src="/static/js/seleccionarIconoModal.js?version=1.8"></script>
+    <script  src="/static/js/urlsymodulos/urlsymodulos.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $('#busqueda').change(function () {
+                var seleccionadas = $(this).children('option:selected').toArray();
+                var opciones = [];
+                for (var i = 0; i < seleccionadas.length; i++) {
+                    opciones.push($(seleccionadas[i]).val().toUpperCase())
+                }
+                if (seleccionadas.length > 0) {
+                    $('.jstree-container-ul > li').each(function () {
+                        var currentLiText = $(this).attr('data-paraBuscar').toUpperCase(),
+                            showCurrentLi = opciones.indexOf(currentLiText) !== -1;
+                        $(this).toggle(showCurrentLi);
+                    });
+                } else {
+                    $('.jstree-container-ul > li').each(function () {
+                        $(this).toggle(true);
+                    });
+                }
+            });
+
+        });
+
+    </script>
 {% endblock %}

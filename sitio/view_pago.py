@@ -19,7 +19,7 @@ from appfloreria import settings
 from appfloreria.settings import URL_GENERAL, JS_PAYPAL_URL, JS_PAYPAL_URL_TEST, PAYPAL_ST
 from seguridad.models import SessionUser
 from sitio.forms import PedidoArchivoPagoForm
-from venta.models import Pedido, PedidoDetalle, PagoPayPhone, PagoTransferencia, HistorialPedido
+from venta.models import Pedido, PedidoDetalle, PagoTransferencia, HistorialPedido
 
 
 @login_required(login_url='/login/')

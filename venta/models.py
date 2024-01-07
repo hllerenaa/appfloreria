@@ -207,7 +207,6 @@ class Pedido(ModeloBase):
 
     def get_resp_metodo_pago(self):
         Modelo = PagoTransferencia if self.metodo_pago == "TRANSFERENCIA_BANCARIA" else \
-                 PagoPayPhone if self.metodo_pago == "PAYPHONE" else \
                  PagoPayPal if self.metodo_pago == "PAYPAL" else None
 
         obj = Modelo.objects.filter(
@@ -260,77 +259,6 @@ class PedidoAdicionalesDetalle(ModeloBase):
     item = models.ForeignKey(PedidoDetalle, on_delete=models.PROTECT, verbose_name="Product Detail")
     items_adicionales = models.ForeignKey("mantenimiento.ProductoItems", on_delete=models.PROTECT, verbose_name="Additional Item")
     total = models.DecimalField(verbose_name="Total", default=0, max_digits=30, decimal_places=2,)
-
-
-class PagoPayPhone(ModeloBase):
-    # GenericForeignKey
-    content_type = models.ForeignKey("contenttypes.ContentType", on_delete=models.PROTECT, blank=True, null=True)
-    object_id = models.PositiveIntegerField(blank=True, null=True)
-    modelo = GenericForeignKey('content_type', 'object_id')
-    # ----------------------------------------------------------------
-    email = models.CharField("Email", max_length=255, null=True, blank=True)
-    cardType = models.CharField("cardType", max_length=255, null=True, blank=True)
-    bin = models.TextField("bin", null=True, blank=True)
-    lastDigits = models.CharField("lastDigits", max_length=20, null=True, blank=True)
-    deferredCode = models.TextField("deferredCode", null=True, blank=True)
-    deferred = models.BooleanField("deferred", null=True, blank=True)
-    cardBrand = models.CharField("cardBrand", max_length=255, null=True, blank=True)
-    amount = models.DecimalField("amount", max_digits=19, decimal_places=2)
-    clientTransactionId = models.TextField("clientTransactionId", null=True, blank=True)
-    phoneNumber = models.CharField("phoneNumber", max_length=255, null=True, blank=True)
-    statusCode = models.CharField("statusCode", max_length=255, null=True, blank=True)
-    transactionStatus = models.CharField("transactionStatus", max_length=255, null=True, blank=True)
-    authorizationCode = models.CharField("authorizationCode", max_length=255, null=True, blank=True)
-    messageCode = models.CharField("messageCode", max_length=255, null=True, blank=True)
-    transactionId = models.CharField("transactionId", max_length=255, null=True, blank=True)
-    document = models.CharField("document", max_length=100, null=True, blank=True)
-    currency = models.CharField("currency", max_length=20, null=True, blank=True)
-    optionalParameter2 = models.CharField("optionalParameter2", max_length=255, null=True, blank=True)
-    storeName = models.CharField("storeName", max_length=255, null=True, blank=True)
-    date = models.DateTimeField("date", null=True, blank=True)
-    regionIso = models.CharField("regionIso", max_length=50, null=True, blank=True)
-    transactionType = models.CharField("transactionType", max_length=255, null=True, blank=True)
-    datajson = models.TextField("Respuesta Api")
-    camposdiferentes = models.BooleanField("El api devolvió diferentes campos")
-
-    def __str__(self):
-        return self.datajson
-
-    @staticmethod
-    def registrar(modelo, data):
-        import json
-        from core.funciones import round_num_dec
-        from datetime import datetime
-
-        obj = None
-
-        try:
-            camposA = ['email', 'cardType', 'bin', 'lastDigits', 'deferredCode', 'deferred', 'cardBrand', 'amount',
-                       'clientTransactionId', 'phoneNumber', 'statusCode', 'transactionStatus', 'authorizationCode',
-                       'messageCode',
-                       'transactionId', 'document', 'currency', 'optionalParameter2', 'storeName', 'date', 'regionIso',
-                       'transactionType']
-
-            camposB = list(data.keys())
-
-            camposA.sort()
-            camposB.sort()
-
-            data['datajson'] = json.dumps(data)
-            data['modelo'] = modelo
-            data['amount'] = round_num_dec(Decimal(str(int(data['amount']) / 100)))
-            data['date'] = datetime.strptime(data['date'], "%Y-%m-%dT%H:%M:%S.%f") if 'date' in data else datetime.now()
-            data['camposdiferentes'] = not (camposA == camposB)
-
-            camposA = camposA + ['camposdiferentes', 'modelo', 'datajson']
-
-            obj = PagoPayPhone.objects.create(
-                **{x: data.get(x) for x in camposA}
-            )
-        except Exception as ex:
-            print(ex)
-
-        return obj
 
 
 class PagoTransferencia(ModeloBase):
