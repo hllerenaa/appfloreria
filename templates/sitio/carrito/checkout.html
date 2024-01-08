@@ -152,7 +152,7 @@
                         class="text-decoration-underline ms-1">Método de pago</span></h5>
                 <div class="form-check mb-4">
                     {% if PAYPHONE_ST %}
-                        <input class="form-check-input metodo_pago" type="radio" name="metodo_pago" required checked
+                        <input class="form-check-input metodo_pago" type="radio" name="metodo_pago" required
                                id="id_metodo_pago" value="PAYPHONE">
                         <label class="form-check-label" for="id_metodo_pago"><span><span
                                 class="d-block fs-base text-dark fw-medium mb-1">Payphone</span><span class="text-body">Paga desde la plataforma o usando tu tarjeta.</span></span></label>
@@ -165,7 +165,7 @@
                             class="d-block fs-base text-dark fw-medium mb-1">Transferencia Bancaria / Depósito</span><span
                             class="text-body">Paga desde tu banco de preferencia.</span></span></label><br>
                     {% if PAYPAL_ST %}
-                        <input class="form-check-input metodo_pago" type="radio" name="metodo_pago" required
+                        <input class="form-check-input metodo_pago" type="radio" name="metodo_pago" required   checked
                                id="id_metodo_pago" value="PAYPAL">
                         <label class="form-check-label" for="id_metodo_pago"><span><span
                                 class="d-block fs-base text-dark fw-medium mb-1">Paypal</span><span class="text-body">Paga desde la plataforma.</span></span></label>
