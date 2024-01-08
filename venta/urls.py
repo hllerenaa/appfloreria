@@ -1,5 +1,6 @@
 from django.urls import path, re_path, include
 
+from .view_reportes import reportesView
 from .view_pedido import pedidoView
 
 venta_urls = (
@@ -7,6 +8,11 @@ venta_urls = (
         "nombre": "Pagos Online",
         "url": 'pedidos/',
         "vista": pedidoView
+    },
+    {
+        "nombre": "Reporte",
+        "url": 'reportes/',
+        "vista": reportesView
     },
 )
 

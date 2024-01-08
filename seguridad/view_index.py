@@ -10,6 +10,7 @@ from django.db.models import Value, Count, Sum, F, FloatField
 from django.db.models.functions import Coalesce
 from autenticacion.models import PerfilCliente
 from core.funciones import addData, secure_module
+from mantenimiento.models import Producto
 from sitio.models import VisitaEntorno
 from seguridad.models import *
 from venta.models import Pedido
@@ -65,5 +66,8 @@ def index(request):
         data['totalRecaudados'] = recaudado.aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
         data['totalRecaudar'] = pendiente.aggregate(total=Coalesce(Sum(F('total'), output_field=FloatField()), 0)).get('total')
         data['pedidopendientelist'] = pedidopendientelist = Pedido.objects.values('id').filter(status=True, estado='EN_ESPERA').count()
+        data['pedidopendientelist'] = pedidopendientelist = Pedido.objects.values('id').filter(status=True, estado='EN_ESPERA').count()
 
+        data['totalUsuarios'] = Usuario.objects.values('id').filter(status=True).count()
+        data['totalProductos'] = Producto.objects.values('id').filter(status=True).count()
         return render(request, 'seguridad/index.html', data)

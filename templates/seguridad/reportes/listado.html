@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load templatefunctions %}
+{% block content %}
+
+    <form method="GET">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col-md-2 col-sm-12">
+                    <input type="date" class="form-control" name="fecha_desde" id="id_fecha_desde" title="Date From"
+                           value="{{ fecha_desde }}">
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group mb-3">
+                        <input type="date" class="form-control" name="fecha_hasta" id="id_fecha_hasta" title="Date To"
+                               value="{{ fecha_hasta }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" id="button-addon2"><i
+                                    class="fa fa-search"></i></button>
+                            {% if url_vars %}
+                                <a title="Ver todo" href="{{ ruta }}?{{ dict_url_vars }}" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <h1>Clientes con Pedidos</h1>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table border="1" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="text-center">Cliente</th>
+                                <th class="text-center">Número de Pedidos</th>
+                                <th class="text-center">Total Monetario</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for cliente in clientes_con_pedidos %}
+                                <tr>
+                                    <td class="text-center">{{ cliente.user }}</td>
+                                    <td class="text-center">{{ cliente.numero_pedidos }}</td>
+                                    <td class="text-center">${{ cliente.total_monetario }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h1>Total Recaudado en los Últimos 6 Meses</h1>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <table border="1" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Mes/Año</th>
+                            <th class="text-center">Total Recaudado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for total in totales_por_mes %}
+                            <tr>
+                                <td class="text-center">{{ total.mes|date:"m/Y" }}</td>
+                                <td class="text-center">${{ total.total_recaudado }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Gráfico del Total Recaudado por Mes</h2>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <canvas id="totalRecaudadoPorMesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-4">
+            <h1>Productos más solicitados</h1>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table border="1" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="text-center">Foto</th>
+                                <th class="text-center">Producto</th>
+                                <th class="text-center">Cantidad Total Solicitada</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for producto in productos_mas_solicitados %}
+                                <tr>
+                                    <td class="text-center"><img src="/media/{{ producto.item__foto1 }}" style="width: 50px; height: 50px" class="img-thumbnail"></td>
+                                    <td class="text-center">{{ producto.item__nombre }}</td>
+                                    <td class="text-center">{{ producto.cantidad_total }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h1>Pedidos por Ciudad</h1>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table border="1" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="text-center">Ciudad</th>
+                                <th class="text-center">Cantidad de Pedidos</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ciudad in ciudades %}
+                                <tr>
+                                    <td class="text-center">{{ ciudad.city }}</td>
+                                    <td class="text-center">{{ ciudad.cantidad }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h1>Total Recaudado por Método de Pago</h1>
+            <div class="panel panel-inverse">
+                <div class="panel-body">
+                    <table border="1" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Método de Pago</th>
+                            <th class="text-center">Total Recaudado</th>
+                            <th class="text-center">Cantidad de Pedidos</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for metodo in totales_por_metodo %}
+                            <tr>
+                                <td class="text-center">{{ metodo.metodo_pago }}</td>
+                                <td class="text-center">${{ metodo.total_recaudado }}</td>
+                                <td class="text-center">{{ metodo.cantidad }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block jscript %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('totalRecaudadoPorMesChart').getContext('2d');
+        var totalRecaudadoPorMesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [
+                    {% for total in totales_por_mes %}
+                        "{{ total.mes|date:'m/Y' }}",
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Total Recaudado por Mes',
+                    data: [
+                        {% for total in totales_por_mes %}
+                            {{ total.total_recaudado }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
