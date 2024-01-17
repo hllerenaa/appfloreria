@@ -70,5 +70,5 @@ def reportesView(request):
         data['totales_por_metodo'] = totales_por_metodo
         data['clientes_con_pedidos'] = clientes_con_pedidos
         data['totales_por_mes'] = totales_por_mes
-        data['productos_mas_solicitados'] = productos_mas_solicitados
+        data['productos_mas_solicitados'] = productos_mas_solicitados[:-10]
         return render(request, 'seguridad/reportes/listado.html', data)
