@@ -38,7 +38,7 @@ def registro(request):
                     #     raise ValueError("Acción no permitida, debe ser mayor de edad para completar el registro de usuario.")
                     ciudad_ = Ciudad.objects.get(id=request.POST['ciudad'])
                     username_ = codnombre(nombre_, apellido_)
-                    tpdocumento = "PASAPORTE"
+                    tpdocumento = "CEDULA"
                     if len(tpdocumento) == 10:
                         tpdocumento = "CEDULA"
                     if len(tpdocumento) == 13:
